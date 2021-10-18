@@ -1,0 +1,44 @@
+<aura:component controller="AgentPortalVerifyContactController" implements="forceCommunity:availableForAllPageTypes" access="global">
+    <aura:attribute name ='contactList' type="List"/>
+    <aura:attribute name ='mainContact' type="Contact"/>
+    <aura:attribute name ='agentList' type="List"/>
+    <aura:attribute name ='selectedURN' type="String"/>
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+
+    <!-- <aura:if isTrue="{empty(v.selectedURN)}"> -->
+            <div class="sgap-content-container">
+                <h1>Select an agency</h1>
+                <p>Please select the account you would like to manage agents</p>
+                <table class="ap-select-agency">
+                    <thead>
+                        <tr>
+                            <td>URN</td>
+                            <td>Agency</td>
+                            <td></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <aura:iteration items="{!v.agentList}" var="agency">
+                            <tr>
+                                <td>{!agency.Agent_URN__c}</td>
+                                <td>{!agency.Name}</td>
+                                <td class="slds-text-align_right">
+                                    <lightning:button variant="base" class="ap-btn" value="{!agency.Agent_URN__c}"
+                                        label="Manage Agents" title=""
+                                        onclick="{! c.manageAgents }" />
+                                </td>
+                            </tr>
+                        </aura:iteration>
+                    </tbody>
+                </table>
+            </div>
+     <!-- </aura:if> -->
+    
+    <!-- Display Contact List -->
+    <aura:if isTrue="{!not(empty(v.selectedURN))}">
+        <section class="ap-finance">
+
+        </section>
+    </aura:if>
+</aura:component>
