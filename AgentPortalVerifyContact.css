@@ -40,9 +40,44 @@
     width: 100%;
 }
 
-.THIS.sgap-content-container table.ap-select-agency .ap-btn {
+.THIS .ap-verify-contacts table.ap-select-agency .ap-btn {
     margin-bottom: 0;
+    padding: 6px 10px;
+    line-height:initial;
 }
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(1) {
+ 	width: 30px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:first-child{
+	padding-left: 20px;  
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:last-child{
+	padding-right: 20px;  
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.THIS .alert {
+    background: #D9534F !important;
+}
+
+.THIS .success {
+    background: #649D35 !important;
+}
+
+/*
+.THIS .ap-agent-details .is-disabled{
+    background: #fff;
+    border: 2px solid #d9dbdd;
+    color: #d9dbdd;
+}
+*/
+
 
 .THIS.sgap-content-container table td:nth-child(1) {
     width: 100px;
@@ -55,12 +90,6 @@
 
 .THIS.sgap-content-container table tbody tr:last-of-type td {
     border-bottom: 0;
-}
-
-.THIS .ap-table td:nth-child(1),
-.THIS .ap-table td:nth-child(2),
-.THIS .ap-table td:nth-child(6){
-    width: 125px;
 }
 
 .THIS.sgap-content-container tbody tr:nth-child(1) td {
@@ -83,12 +112,33 @@
     padding-bottom: 10px;
 }
 
-.THIS .ap-agent-details {
+.THIS.manage-agents {
+    width:100%;
+}
+
+.THIS.manage-agents .ap-agent-details {
     position: relative;
     background: #fff;
-    padding: 16px 20px;
+    padding: 0;
     margin-bottom: 10px;
-    width: 40%;
+    width: 100%;
+}
+
+.THIS.manage-agents .ap-agent-details > h1{
+    float:left !important;
+}
+
+.THIS.manage-agents .search-contact {
+    padding: 20px;
+    background: #f5f5f5;
+    margin: 0;
+    border-radius: 6px;
+    float: left;
+    margin-bottom: 30px;
+}
+
+.THIS.manage-agents .search-contact input{
+    width: 280px;
 }
 
 .THIS .expand {
@@ -104,6 +154,27 @@
 
 .THIS .expand.is-open .fa {
     transform: rotate(180deg);
+}
+
+
+.THIS .ap-agent-details button,
+.THIS .ap-pagination button{
+    margin-bottom:20px;
+}
+
+.THIS .ap-agent-details .alert-outline,
+.THIS .ap-pagination .alert-outline{
+    background: #fff;
+    color: #D9534F;
+    border: 2px solid #D9534F !important;
+}
+
+
+.THIS .ap-agent-details .success-outline,
+.THIS .ap-pagination .success-outline{
+    background: #fff;
+    color: #649D35;
+    border: 2px solid #649D35 !important;
 }
 
 .THIS ul.ap-transactions-tabs {
@@ -377,89 +448,6 @@
     outline: none;
 }
 
-.THIS .ap-table {
-    border-collapse: separate;
-    border-spacing: 0 6px;
-    position: relative;
-    top: -6px;
-}
-
-.THIS .ap-table thead {
-	background: #005779;
-}
-
-.THIS .ap-table thead span {
-    font-size: 14px;
-}
-
-.THIS .ap-table td {
-    color: #fff;
-    padding: 12px 10px;
-    font-size: 20px;
-    position: relative;
-}
-
-
-.THIS .ap-table tbody td {
-    background: #fff;
-    color: #32363F;
-    font-size: 18px;
-}
-
-.THIS .ap-table thead td:after {
-    opacity: 40%;
-}
-
-.THIS .ap-table td:not(:last-of-type):after {
-    content: '';
-    width: 1px;
-    height: 70%;
-    display: block;
-    background: #E5E5E5;
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-}
-
-.THIS tbody .ap-table_student, .THIS tbody .ap-table_student td {
-    background: #32363F;
-    color: fff;
-    font-size: 17px;
-}
-
-.THIS .ap-table tr:not(.ap-table_student) td {
-    text-align: center;
-}
-
-.THIS .ap-table tr:not(.ap-table_student) td.ap-table_description {
-    text-align: left;
-}
-
-.THIS .ap-table_summary td {
-    width: 25%;
-}
-
-.THIS .ap-table_student ul {
-    margin-bottom: 0;
-}
-
-.THIS .ap-table_student li {
-    color: #D6D6D6;
-    display: inline-block;
-    margin-right: 15px;
-    padding-right: 15px;
-    border-right: 1px solid rgba(255, 255, 255, .15)
-}
-
-.THIS .ap-table_student li:last-of-type {
-    border-right:none;
-}
-
-.THIS .ap-table_student li span {
-    color: #fff;
-}
-
 .THIS.lazy-load-trigger {
     width: 100%;
     height: 10px;
@@ -467,7 +455,7 @@
 
 @media(max-width: 767px) {
     
-    .THIS.ap-finance {
+    .THIS.ap-verify-contacts {
         width: 95%;
         margin: 0 auto;
     }
@@ -478,88 +466,6 @@
     
     .THIS h2 {
         font-size: 24px;
-    }
-    
-    .THIS .ap-table thead {
-        display: none;
-    }
-    
-    .THIS .ap-table td:not(:last-of-type):after {
-        display:none;
-    }
-    
-    .THIS .ap-table_student ul {
-        margin-left: 10px;
-    }
-    
-    .THIS tr.ap-table_student {
-        display: block;
-        margin: 15px 0 0 0;
-    }
-    
-    .THIS tr.ap-table_student li {
-        display: block;
-    }
-
-    .THIS table.ap-table {
-        width: 100%;
-        margin: 0 auto;
-    }
-
-    .THIS .ap-tabletr,
-    .THIS .ap-table td {
-        display: block;
-        width: 100%;
-        margin: 0 auto;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .THIS .ap-table td {
-        display: flex;
-        flex-direction: row;
-        border-bottom: 1px solid #dadada;
-        padding: 6px 0;
-    }
-    
-    .THIS .ap-table tbody td {
-        width: 100%;
-        font-size: 15px;
-        display: flex;
-    	align-items: center;
-    }
-    
-    /** Resets fixed widths set for desktop **/
-    .THIS .ap-table td:nth-child(1), 
-    .THIS .ap-table td:nth-child(6) {
-        width: auto;
-    }
-    
-    .THIS .ap-table tr:not(.ap-table_student) td {
-    	text-align: left;
-    }
-
-    .THIS .ap-table td:last-of-type {
-        border-bottom: 0;
-    }
-
-    .THIS .ap-table td:first-of-type::before {
-        margin: 0;
-    }
-
-    .THIS .ap-table tr:not(.ap-table_student) td::before {
-        content: attr(data-heading);
-        min-width: 120px;
-        margin: 5px 0;
-        padding-left: 10px;
-    }
-    
-    .THIS .ap-table.ap-table_summary td::before {
-        width: 160px;
-    }
-    
-    .THIS .ap-table tr:not(.ap-table_student) td {
-        padding-left: 10px;
     }
     
     .THIS.sgap-content-container {
@@ -609,7 +515,7 @@
         margin-bottom: 5px;
     }
     
-    .THIS.ap-finance .slds-float_right {
+    .THIS.ap-verify-contacts .slds-float_right {
         float:none;
     }
     
