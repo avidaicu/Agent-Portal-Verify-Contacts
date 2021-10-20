@@ -1,4 +1,5 @@
-({
+({  maxPaginatedPages: 5,
+    transactionsPerPage: 50,
     helperMethod : function(component, contacts) {
 		// Display first batch of contacts
 		//let totalPages = Math.ceil(contacts.length / this.transactionsPerPage);
@@ -15,6 +16,8 @@
     pageContacts: function (component, pageNum) {
         pageNum = parseInt(pageNum, 10);
         component.set('v.activePageNum', pageNum);
+        let pagedTransactions = component.get('v.contactList').slice((pageNum) * this.transactionsPerPage, (pageNum + 1) * this.transactionsPerPage);
+        component.set('v.activeContactsRendered', pagedTransactions);
         this.pagination(component, pageNum);
     },
 
@@ -32,5 +35,35 @@
         const pagesArrayStarter = Array.apply(null, Array(noOfPages)).map(function () { });
         const pagesArray = pagesArrayStarter.map(function (x, i) { return (i + startAt) });
         component.set('v.pagesArray', pagesArray);
+    },
+   showToast : function(title, message,type, mode) {
+        var toastEvent = $A.get("e.force:showToast");
+        toastEvent.setParams({
+            "title": title,
+            "message": message,
+            "type" : type,
+            "mode": mode
+        });
+        toastEvent.fire();
+    },
+    handleFilter : function(component){
+        var vieMode = component.get("v.filterView");
+        var contacts = component.get("v.contactListSearched");
+        var totalPages = Math.ceil(contacts.length/this.transactionsPerPage);
+        component.set("v.contactList", contacts);
+        if(vieMode == 'Active'){
+            let selectedAgentsInfo = contacts.filter(con => !con.Requires_verification__c);
+            component.set("v.contactList", selectedAgentsInfo);
+            totalPages = Math.ceil(selectedAgentsInfo.length/this.transactionsPerPage);
+        }
+        if(vieMode == 'Unverified'){
+            let selectedAgentsInfo = contacts.filter(con => con.Requires_verification__c);
+            component.set("v.contactList", selectedAgentsInfo);
+            totalPages = Math.ceil(selectedAgentsInfo.length/this.transactionsPerPage);
+           
+        }
+        component.set("v.totalPages", totalPages)
+        this.pageContacts(component, 0);
+        
     }
 })

@@ -1,12 +1,22 @@
 <aura:component controller="AgentPortalVerifyContactController" implements="forceCommunity:availableForAllPageTypes" access="global">
     <aura:attribute name ='contactList' type="List"/>
+    <aura:attribute name ='contactListSearched' type="List"/>
     <aura:attribute name ='mainContact' type="Contact"/>
     <aura:attribute name ='agentList' type="List"/>
     <aura:attribute name ='selectedURN' type="String"/>
     <aura:attribute name ='selectedContactIds' type="Set"/>
     <aura:attribute name ='searchTerm' type="String"/>
     <aura:attribute name="isChecked" type="Boolean" default="false"/>
+
+    <aura:attribute name ="openModal" type="Boolean" default="false"/>
+    <aura:attribute name ="modalTitle" type="String" />
+    <aura:attribute name ="messageConfirmation" type="String"/>
+    <aura:attribute name ="selectedAgentsInfo" type="List"/>
+    <aura:attribute name ="isDeactivateAction" default="false" type="Boolean"/>
     
+    <aura:attribute name ="fiterViewOptions" type="List" default="[{'label': 'All', 'value': 'All'}, {'label': 'Active', 'value': 'Active'},
+    {'label': 'Unverified', 'value': 'Unverified'}]"/>
+    <aura:attribute name ="filterView" type="String" default="All"/>
     <!-- 
 	************************************************** 
 	Pagination
@@ -14,10 +24,11 @@
     <aura:attribute name="totalPages" type="Integer" />
     <aura:attribute name="pagesArray" type="Integer" />
     <aura:attribute name="activePageNum" type="Integer" />
+    <aura:attribute name="activeContactsRendered" type="List" />
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-
-    <aura:if isTrue="{!empty(v.selectedURN)}">
+	{!v.agentList}
+    <aura:if isTrue="{!and(v.agentList, empty(v.selectedURN))}">
             <div class="sgap-content-container">
                 <h1>Select an agency</h1>
                 <p>Please select the account you would like to manage agents</p>
@@ -54,15 +65,14 @@
                 
                 <div class="slds-clearfix">
                     <div class="slds-float_right">
-                        <button class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
-                           role="button">
-                            Verify selected
-                        </button>
                         
-                        <button class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
-                           role="button">
-                            Deactivate selected
-                        </button>
+                        <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
+                                                label="Verify selected" title="Deactivate selected"
+                                                onclick="{! c.verifyAgents }" />
+
+                        <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
+                                                label="Deactivate selected" title="Deactivate selected"
+                                                onclick="{! c.deactivateAgents }" />
                     </div>
                 </div>
                 
@@ -71,7 +81,7 @@
                          <div class="ap-filter ap-statement-view">
                              <lightning:combobox name="filterStatus" label="Filter by"
                                                  value="{!v.filterView}" placeholder="All"
-                                                 options="{! v.transactionViewOptions }" onchange="{! c.setView }" />
+                                                 options="{! v.fiterViewOptions }" onchange="{! c.setView }" />
                          </div>
                          
                      </div>  
@@ -103,7 +113,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <aura:iteration items="{!v.contactList}" var="con">
+                            <aura:iteration items="{!v.activeContactsRendered}" var="con">
                                 <tr>
                                     <td>
                                         <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/></td>
@@ -111,7 +121,7 @@
                                     <td>{!con.Email}</td>
                                     
                                     <td>
-                                        <aura:if isTrue="{!con.Requires_Verification__c}">
+                                        <aura:if isTrue="{!con.Requires_verification__c}">
                                             <span> Unverified</span>
                                             <aura:set attribute="else">
                                               <span> Active</span>
@@ -122,14 +132,14 @@
                                     <td><lightning:formattedDateTime value="{!con.CreatedDate}" year="numeric" month="numeric" day="numeric" /></td>
                                     <td class="slds-text-align_right">
                                         
-                                        <aura:if isTrue="{!con.Requires_Verification__c}">
+                                        <aura:if isTrue="{!con.Requires_verification__c}">
                                             <lightning:button variant="base" class="ap-btn" value="{!con.Id}"
                                                 label="Verify" title=""
-                                                onclick="{! c.verifyContacts }" />
+                                                onclick="{! c.verifyAgents }" />
                                             <aura:set attribute="else">
-                                             <lightning:button variant="base" class="ap-btn alert" value="{!con.Id}"
+                                            <lightning:button variant="base" class="ap-btn alert" value="{!con.Id}"
                                                 label="Deactivate" title=""
-                                                onclick="{! c.deactivateContacts }" />
+                                                onclick="{! c.deactivateAgents }" />
                                             </aura:set>
                                         </aura:if>
                                     </td>
@@ -177,20 +187,57 @@
                         
                         <div class="slds-clearfix">
                             <div class="slds-float_right">
-                                <button class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
-                                   role="button">
-                                    Verify selected
-                                </button>
-                                
-                                <button class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
-                                   role="button">
-                                    Deactivate selected
-                                </button>
+                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
+                                label="Verify selected" title="Deactivate selected"
+                                onclick="{! c.verifyAgents }" />
+
+                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
+                                label="Deactivate selected" title="Deactivate selected"
+                                onclick="{! c.deactivateAgents }" />
                             </div>
                         </div>
                 	</div>
                 
             </section>
         </div>
+        <!--Confirm modal-->
+        <aura:if isTrue="{!v.openModal}">
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
+                aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <h1 class="slds-modal__title slds-hyphenate">{!v.modalTitle}</h1>
+                        
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                       <p>
+                           {!v.messageConfirmation}
+                       </p>
+                       <aura:iteration items="{!v.selectedAgentsInfo}" var="con">
+                        <p>
+                            {!con.Name} - {!con.Email}
+                        </p>
+                       </aura:iteration>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="base" 
+                        label="cancel" title="Deactivate selected"
+                        onclick="{! c.closeModal }" />
+                        <aura:if isTrue="{!v.isDeactivateAction}">
+                            <lightning:button variant="brand" 
+                                                    label="Deactivate" title="Deactivate"
+                                                    onclick="{! c.handleDeactivateAgents }" />
+                            <aura:set attribute="else">                        
+                                <lightning:button variant="brand" 
+                                                    label="Verify" title="Verify"
+                                                    onclick="{! c.handleVerifyAgents }" />
+                            </aura:set>
+                        </aura:if>
+                      </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </aura:if>
     </aura:if>
+    
 </aura:component>
