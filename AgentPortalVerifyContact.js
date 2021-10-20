@@ -54,6 +54,9 @@
        var contactId = event.getSource().get("v.value"); 
        var ischecked = event.getSource().get("v.checked"); 
        var selectedAgents = new Set(component.get("v.selectedContactIds"));
+       
+       component.set("v.ischecked", ischecked);
+       
        if(ischecked){
            selectedAgents.add(contactId);
        }else{
@@ -71,6 +74,13 @@
        console.log('selectedAgents:', selectedAgents.size);
        console.log(contactId);
        console.log(component.get("v.isChecked"));
+        
+       	var el = document.getElementsByClassName(contactId);
+        if(ischecked){
+            el[0].classList.add("selected");
+        }else{
+           el[0].classList.remove("selected");  
+        }
     },
     clickAll : function(component, event, helper) {
         // get value 
@@ -108,9 +118,23 @@
             if(selectedAgents.size > 0){
                 component.set("v.isChecked", true);
             }
-        }
+                
+            //var els = document.getElementsByClassName(selectedAgents);
+            //if(ischecked){
+            //    els[0].classList.add("selected");
+            //}else{
+            //   els[0].classList.remove("selected");  
+            //}
+                
+            var toggleText = component.find("allSelectedRows");
+            if(ischecked){
+               toggleText.forEach(el => $A.util.toggleClass(el, "selected"));
+            }
+                
+            }
 
         console.log('selectedUrns : ' + selectedUrns);
+               
      },
      searchContact : function(component, event, helper) {
         var action = component.get('c.getContactsByEmailName');

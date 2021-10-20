@@ -114,9 +114,11 @@
                         </thead>
                         <tbody>
                             <aura:iteration items="{!v.activeContactsRendered}" var="con">
-                                <tr>
+                                <tr aura:id="allSelectedRows" class="{!con.Id}">
                                     <td>
-                                        <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/></td>
+                                        <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
+                                        <p></p>
+                                    </td>
                                     <td>{!con.Name}</td>
                                     <td>{!con.Email}</td>
                                     
