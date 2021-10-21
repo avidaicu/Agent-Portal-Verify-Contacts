@@ -119,17 +119,10 @@
                 component.set("v.isChecked", true);
             }
                 
-            //var els = document.getElementsByClassName(selectedAgents);
-            //if(ischecked){
-            //    els[0].classList.add("selected");
-            //}else{
-            //   els[0].classList.remove("selected");  
-            //}
-                
-            var toggleText = component.find("allSelectedRows");
-            if(ischecked){
-               toggleText.forEach(el => $A.util.toggleClass(el, "selected"));
-            }
+            // var toggleText = component.find("allSelectedRows");
+            // if(ischecked){
+            //    toggleText.forEach(el => $A.util.toggleClass(el, "selected"));
+            // }
                 
             }
 

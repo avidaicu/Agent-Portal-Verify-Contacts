@@ -61,41 +61,36 @@
     <aura:if isTrue="{!not(empty(v.selectedURN))}">
         <div class="sgap-content-container manage-agents">
             <section class="ap-agent-details">
-                <h1>Manage your Agents</h1>
                 
-                <div class="slds-clearfix">
-                    <div class="slds-float_right">
-                        
-                        <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
-                                                label="Verify selected" title="Deactivate selected"
-                                                onclick="{! c.verifyAgents }" />
+                <div class="slds-clearfix header-container">
+                    <h1>Manage your Agents</h1>
+    
+                    <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn' : 'slds-button ap-btn is-disabled'}"
+                                            label="Verify selected" title="Deactivate selected"
+                                            onclick="{! c.verifyAgents }" />
 
-                        <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
-                                                label="Deactivate selected" title="Deactivate selected"
-                                                onclick="{! c.deactivateAgents }" />
+                    <!-- <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
+                                            label="Deactivate selected" title="Deactivate selected"
+                                            onclick="{! c.deactivateAgents }" /> -->
+                   
+                </div>
+                
+                <div class="slds-clearfix search-filter-container">
+                    <div class="ap-filter ap-statement-view">
+                        <lightning:combobox name="filterStatus" label="Filter by"
+                                            value="{!v.filterView}" placeholder="All"
+                                            options="{! v.fiterViewOptions }" onchange="{! c.setView }" />
+                    </div>  
+                    <div class="search-contact">
+                        <lightning:input
+                            name="inline-search-input"
+                            label="This is a search input with a hidden label. The label is still required for accessibility reasons"
+                            type="search"
+                            variant="label-hidden"
+                            value="{!v.searchTerm}"
+                            placeholder="Search by agent name or email"
+                            onchange="{!c.searchContact}"/>                
                     </div>
-                </div>
-                
-                 <div class="slds-clearfix slds-float_right">
-                     <div class="ap-filter-container">
-                         <div class="ap-filter ap-statement-view">
-                             <lightning:combobox name="filterStatus" label="Filter by"
-                                                 value="{!v.filterView}" placeholder="All"
-                                                 options="{! v.fiterViewOptions }" onchange="{! c.setView }" />
-                         </div>
-                         
-                     </div>  
-                </div>
-                
-                <div class="search-contact">
-                    <lightning:input
-                        name="inline-search-input"
-                        label="This is a search input with a hidden label. The label is still required for accessibility reasons"
-                        type="search"
-                        variant="label-hidden"
-                        value="{!v.searchTerm}"
-                        placeholder="Search by agent name or email"
-                        onchange="{!c.searchContact}"/>                
                 </div>
                 
             </section>
@@ -114,19 +109,23 @@
                         </thead>
                         <tbody>
                             <aura:iteration items="{!v.activeContactsRendered}" var="con">
-                                <tr aura:id="allSelectedRows" class="{!con.Id}">
+                                <tr>
                                     <td>
-                                        <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
-                                        <p></p>
+                                        <aura:if isTrue="{!con.Requires_verification__c}">
+                                            <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
+                                            <aura:set attribute="else">
+                                                <lightning:input aura:id="checkContact" disabled="{!v.unverifiedAgents}" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
+                                            </aura:set>
+                                        </aura:if>
                                     </td>
                                     <td>{!con.Name}</td>
                                     <td>{!con.Email}</td>
                                     
                                     <td>
                                         <aura:if isTrue="{!con.Requires_verification__c}">
-                                            <span> Unverified</span>
+                                            <span class="unverified"> Unverified</span>
                                             <aura:set attribute="else">
-                                              <span> Active</span>
+                                              <span class="verified"> Active</span>
                                             </aura:set>
                                         </aura:if>
                                     </td>
@@ -135,7 +134,7 @@
                                     <td class="slds-text-align_right">
                                         
                                         <aura:if isTrue="{!con.Requires_verification__c}">
-                                            <lightning:button variant="base" class="ap-btn" value="{!con.Id}"
+                                            <lightning:button variant="base" class="ap-btn success" value="{!con.Id}"
                                                 label="Verify" title=""
                                                 onclick="{! c.verifyAgents }" />
                                             <aura:set attribute="else">
@@ -187,17 +186,13 @@
                             </ul>
                         </div>
                         
-                        <div class="slds-clearfix">
+                        <!-- <div class="slds-clearfix">
                             <div class="slds-float_right">
-                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn success-outline' : 'slds-button ap-btn success-outline is-disabled'}"
+                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn' : 'slds-button ap-btn is-disabled'}"
                                 label="Verify selected" title="Deactivate selected"
                                 onclick="{! c.verifyAgents }" />
-
-                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
-                                label="Deactivate selected" title="Deactivate selected"
-                                onclick="{! c.deactivateAgents }" />
                             </div>
-                        </div>
+                        </div> -->
                 	</div>
                 
             </section>

@@ -1,9 +1,18 @@
-.THIS h1, .THIS h2 {
+/* .THIS h1, .THIS h2 {
     margin: 0!important;
-}
+} */
+
 
 .THIS .is-hidden {
     display: none;
+}
+
+.THIS .verified {
+    color: #649D35;
+}
+
+.THIS .unverified {
+    color: #0099d8;
 }
 
 .THIS td {
@@ -44,25 +53,44 @@
     margin-bottom: 0;
     padding: 6px 10px;
     line-height:initial;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(1) {
- 	width: 30px;
+    min-width: 90px;
 }
 
 .THIS .ap-verify-contacts table.ap-select-agency td:first-child{
 	padding-left: 20px;  
+    width: 60px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(2) {
+    width: 280px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(3) {
+    width: 340px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(4) {
+    width: 170px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(5) {
+    width: 140px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(6) {
+    width: 60px;
 }
 
 .THIS .ap-verify-contacts table.ap-select-agency td:last-child{
 	padding-right: 20px;  
+    width: 200px;
 }
 
 .THIS .ap-verify-contacts table.ap-select-agency tr:nth-child(even) {
     background: #f9f9f9;
 }
 
-.THIS .ap-verify-contacts table.ap-select-agency .selected {
+/* .THIS .ap-verify-contacts table.ap-select-agency .selected {
     border: 2px solid #A4DAF4;
     background: #DBF1FB;
 }
@@ -73,24 +101,17 @@
 
 .THIS .ap-verify-contacts table.ap-select-agency .selected:nth-child(even) {
     background: #DBF1FB;
-}
+} */
 
-.THIS .alert {
-    background: #D9534F !important;
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox_faux, 
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox--faux, 
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]~.slds-checkbox_faux, 
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]~.slds-checkbox--faux, 
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox__label .slds-checkbox_faux, 
+.THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox__label .slds-checkbox--faux {
+    opacity: 0.4;
+    pointer-events: none;
 }
-
-.THIS .success {
-    background: #649D35 !important;
-}
-
-/*
-.THIS .ap-agent-details .is-disabled{
-    background: #fff;
-    border: 2px solid #d9dbdd;
-    color: #d9dbdd;
-}
-*/
-
 
 .THIS.sgap-content-container table td:nth-child(1) {
     width: 100px;
@@ -121,15 +142,12 @@
     font-size: 1.3em;
 }
 
-.THIS.sgap-content-container h1 {
-    padding-bottom: 10px;
-}
-
 .THIS.manage-agents {
     width:100%;
 }
 
 .THIS.manage-agents .ap-agent-details {
+    margin-top:15px;
     position: relative;
     background: #fff;
     padding: 0;
@@ -138,7 +156,12 @@
 }
 
 .THIS.manage-agents .ap-agent-details > h1{
-    float:left !important;
+    float:left;
+}
+
+.THIS .search-filter-container {
+    position: relative;
+    margin-bottom: 30px;
 }
 
 .THIS.manage-agents .search-contact {
@@ -147,114 +170,29 @@
     margin: 0;
     border-radius: 6px;
     float: left;
-    margin-bottom: 30px;
 }
 
 .THIS.manage-agents .search-contact input{
     width: 280px;
 }
 
-.THIS .expand {
-    position: absolute;
-    top: 40px;
-    right: 20px;
-    font-size: 1.4em;
-}
 
-.THIS .expand .fa {
-    transition: all .3s;
-}
-
-.THIS .expand.is-open .fa {
-    transform: rotate(180deg);
-}
-
-
-.THIS .ap-agent-details button,
+.THIS.manage-agents .ap-agent-details button,
 .THIS .ap-pagination button{
     margin-bottom:20px;
 }
 
-.THIS .ap-agent-details .success-outline,
-.THIS .ap-pagination .success-outline{
-    background: #fff;
-    color: #649D35;
-    border: 2px solid #649D35 !important;
-}
-
-.THIS .ap-agent-details .success-outline:hover,
-.THIS .ap-pagination .success-outline:hover{
-    background: none;
-}
-
-.THIS .ap-agent-details .alert-outline,
-.THIS .ap-pagination .alert-outline{
-    background: #fff;
-    color: #D9534F;
-    border: 2px solid #D9534F !important;
-}
-
-.THIS .ap-agent-details .alert-outline:hover,
-.THIS .ap-pagination .alert-outline:hover{
-    background: none;
-}
-
-.THIS ul.ap-transactions-tabs {
-    margin-top: 20px;
-    margin-bottom: 0;
-    border-bottom: 2px solid #32363F;
-}
-
-.THIS .ap-transactions-tabs li {
-    display: inline-block;
-}
-
-.THIS .ap-transactions-tabs li span {
-	pointer-events: none;   
-}
-
-.THIS .ap-transactions-tabs a {
+.THIS.manage-agents .ap-agent-details .header-container {
     position: relative;
-    top: 4px;
-    padding: 6px 15px;
-    background: #32363F;
-    margin-right: 3px;
-    box-sizing: border-box;
-    display: block;
-    color: #fff;
-    font-family: "HelveticaNeueW01-Thin", sans-serif;
-    font-weight: lighter;
-    font-size: 16px;
-    text-decoration: none;
-    transition: all .3s;
-    cursor: pointer;
 }
 
-.THIS .ap-transactions-tabs a.active {
-    background: #0099de;
-	font-size: 18px;
-    padding: 10px 15px;
-    top: 0;
-}
-
-.THIS .ap-transactions-tabs a:not(.active):hover, 
-.THIS .ap-transactions-tabs a:not(.active):focus {
-    background: #005779;
-} 
-
-
-.THIS .ap-transactions-pill {
-    background: rgba(0,0,0,.3);
-    margin: 0 0 0 10px;
-    border-radius: 10px;
-    line-height: 20px;
-    display: inline-block;
-    padding: 5px 8px;
-    pointer-events: none;
-}
-
-.THIS a.active .ap-transactions-pill {
-    background: #005779;
+.THIS.manage-agents .ap-agent-details .ap-btn{
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    font-size: 18px;
+    margin: 0;
+    font-family: "HelveticaNeueW01-Thin";
 }
 
 .THIS .slds-button-group-list .slds-button.is-active {
@@ -264,26 +202,31 @@
 }
 
 .THIS .ap-pagination {
-    text-align: right;
-    padding: 20px 0;
+    text-align: center;
+    padding: 0;
+    margin-top:30px;
+    margin-bottom:30px;
 }
 
 .THIS .slds-button-group-list li {
     margin: 0 0 0 5px;
-    border: 0;
 }
 
 .THIS .ap-pagination .slds-button {
     min-width: 40px;
     min-height: 40px;
-    border: 0;
     transition: all .3s;
+    padding-bottom:0;
+    margin-bottom:0;
 }
 
 /**
  * Filters
  */
 .THIS .ap-filter {
+    position: absolute;
+    right: 0;
+    bottom: 0;
     width: auto;
     display: inline-block;
     background: #fff;
@@ -291,10 +234,9 @@
     margin-left: 5px;
     padding: 6px 10px;
     transition: all .3s;
-	border: 1px solid #f0f0f0; /* Hidden as same colours as bg. Allows for smoother animation when an error occurs */
+	border: 1px solid #D4D4D4;
 }
 
-.THIS .ap-filter.statement-combobox .slds-form-element,
 .THIS .ap-filter.date-range .slds-form-element {
     width: 150px;
 }
@@ -319,10 +261,6 @@
 
 .THIS .ap-filter button {
     border: 0;
-}
-
-.THIS .ap-filter.statement-combobox label {
-    display:none;
 }
 
 .THIS .ap-filter * {
@@ -365,64 +303,6 @@
 
 .THIS .ap-filter .slds-icon-utility-down {
     display: none;
-}
-
-.THIS .ap-filter-container {
-    display: flex;
-}
-
-.THIS .ap-no-transactions .ap-no-transactions_icon {
-    width: 200px;
-    height: 200px;
-    background: #dadada;
-    margin: 50px auto 20px auto;
-    border-radius: 50%;
-    display: flex;
-    text-align: center;
-    justify-content: center;
-    align-items: center;
-    font-size: 100px;
-    color: #fff;
-    border: 5px solid #e2e2e2;
-    position: relative;
-}
-
-.THIS .ap-no-transactions .ap-no-transactions_icon:before {
-    content: '';
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border: 5px solid #f0f0f0;
-    border-radius: 50%;
-}
-
-.THIS .ap-no-transactions .ap-no-transactions_icon:after {
-	content: '';
-    width: calc(100% + 30px);
-    height: calc(100% + 30px);
-    position: absolute;
-    top: -15px;
-    left: -15px;
-    border: 5px solid #eaeaea;
-    border-radius: 50%;
-}
-
-.THIS .ap-no-transactions span {
-    color: #c3c3c3;
-}
-
-.THIS .ap-no-transactions span:before {
-    content: '?';
-    position: absolute;
-    top: 50%;
-    left: 80px;
-    font-size: 45px;
-}
-
-.THIS .ap-no-transactions h3 {
-    text-align: center;
 }
 
 .THIS .ap-filter + .ap-filter-search {
@@ -499,31 +379,18 @@
         width: 85px;
     }
     
-    .THIS .ap-agent-details {
+    .THIS.manage-agents .ap-agent-details {
         width: 100%;
         padding-right:50px;
     }
     
-    .THIS .ap-agent-details h1 {
+    .THIS.manage-agents .ap-agent-details h1 {
         word-break: break-all;
         font-size: 24px;
     }
 
     .THIS .ap-filter-container {
         flex-direction: column;
-    }
-
-    .THIS .ap-filter.statement-combobox .slds-form-element,
-    .THIS .ap-filter.date-range .slds-form-element {
-        width: 100%;
-    }
-        
-    .THIS .ap-filter-container .statement-combobox {
-        margin:5px 0 0 0;
-    }
-    
-    .THIS .statement-combobox .slds-form-element__control {
-        width: 100%;
     }
     
     .THIS .ap-filter .slds-form-element {
@@ -540,12 +407,6 @@
     .THIS.ap-verify-contacts .slds-float_right {
         float:none;
     }
-    
-    /*
-    .THIS .ap-filter .slds-form-element__label {
-        width: 70px;
-    }
-    */
     
     .THIS .ap-filter .slds-form-element__control {
         flex-grow:1;
@@ -597,6 +458,14 @@
 
 .THIS .ap-btn .fa {
     margin-left: 10px;
+}
+
+.THIS .ap-btn.alert {
+    background: #D9534F;
+}
+
+.THIS .ap-btn.success {
+    background: #649D35;
 }
 
 .THIS .loader {
