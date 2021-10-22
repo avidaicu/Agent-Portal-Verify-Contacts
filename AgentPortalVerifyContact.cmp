@@ -7,12 +7,16 @@
     <aura:attribute name ='selectedContactIds' type="Set"/>
     <aura:attribute name ='searchTerm' type="String"/>
     <aura:attribute name="isChecked" type="Boolean" default="false"/>
-
+    <aura:attribute name="isCheckedAll" type="Boolean" default="false"/>
+    
+    <aura:attribute name="isFetching" type="Boolean" default="false"/>
+    <aura:attribute name="isupdatingContact" type="Boolean" default="false"/>
     <aura:attribute name ="openModal" type="Boolean" default="false"/>
     <aura:attribute name ="modalTitle" type="String" />
     <aura:attribute name ="messageConfirmation" type="String"/>
     <aura:attribute name ="selectedAgentsInfo" type="List"/>
     <aura:attribute name ="isDeactivateAction" default="false" type="Boolean"/>
+    <aura:attribute name ="doesContactsExist" default="false" type="Boolean"/>
     
     <aura:attribute name ="fiterViewOptions" type="List" default="[{'label': 'All', 'value': 'All'}, {'label': 'Active', 'value': 'Active'},
     {'label': 'Unverified', 'value': 'Unverified'}]"/>
@@ -27,8 +31,21 @@
     <aura:attribute name="activeContactsRendered" type="List" />
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
-	{!v.agentList}
-    <aura:if isTrue="{!and(v.agentList, empty(v.selectedURN))}">
+	<aura:if isTrue="{!v.isFetching}">
+        <div class="slds-m-vertical_medium" style="width: 100%; height: 60px; z-index:9000">
+            <lightning:spinner alternativeText="Loading" size="small" />
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!empty(v.agentList)}">
+        <div class="sgap-content-container">
+            <!-- Not authorised to view verify contacts page -->
+            <h1>Insufficient access rights to perform the operation</h1>
+            <p>Please speak with your main contact at Study Group if you feel this is an error and would like to be granted permission.</p>
+        </div>
+    </aura:if>
+    
+    <aura:if isTrue="{!and(!empty(v.agentList), empty(v.selectedURN))}">
             <div class="sgap-content-container">
                 <h1>Select an agency</h1>
                 <p>Please select the account you would like to manage agents</p>
@@ -98,7 +115,7 @@
                 <table class="ap-select-agency">
                         <thead>
                             <tr>
-                                <td><lightning:input aura:id="checkAll" type="checkbox" value="{!v.selectedURN}" onchange="{!c.clickAll}"/></td>
+                                <td data-name="Select all:"><lightning:input aura:id="checkAll" type="checkbox" value="{!v.selectedURN}" onchange="{!c.clickAll}"/></td>
                                 <td>Name</td>
                                 <td>Email</td>
                                 <td>Status</td>
@@ -110,18 +127,13 @@
                         <tbody>
                             <aura:iteration items="{!v.activeContactsRendered}" var="con">
                                 <tr>
-                                    <td>
-                                        <aura:if isTrue="{!con.Requires_verification__c}">
-                                            <lightning:input aura:id="checkContact" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
-                                            <aura:set attribute="else">
-                                                <lightning:input aura:id="checkContact" disabled="{!v.unverifiedAgents}" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
-                                            </aura:set>
-                                        </aura:if>
+                                    <td data-name="Select:">
+                                        <lightning:input aura:id="checkContact" disabled="{!!con.Requires_verification__c}" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
                                     </td>
-                                    <td>{!con.Name}</td>
-                                    <td>{!con.Email}</td>
+                                    <td data-name="Name:">{!con.Name}</td>
+                                    <td data-name="Email:">{!con.Email}</td>
                                     
-                                    <td>
+                                    <td data-name="Status:">
                                         <aura:if isTrue="{!con.Requires_verification__c}">
                                             <span class="unverified"> Unverified</span>
                                             <aura:set attribute="else">
@@ -129,8 +141,8 @@
                                             </aura:set>
                                         </aura:if>
                                     </td>
-                                    <td>{!con.Agent_URN__c}</td>
-                                    <td><lightning:formattedDateTime value="{!con.CreatedDate}" year="numeric" month="numeric" day="numeric" /></td>
+                                    <td data-name="URN:">{!con.Agent_URN__c}</td>
+                                    <td data-name="Registered:"><lightning:formattedDateTime value="{!con.CreatedDate}" year="numeric" month="numeric" day="numeric" /></td>
                                     <td class="slds-text-align_right">
                                         
                                         <aura:if isTrue="{!con.Requires_verification__c}">
@@ -148,6 +160,10 @@
                             </aura:iteration>
                         </tbody>
                     </table>
+                
+                    <aura:if isTrue="{!v.doesContactsExist}">
+                        <p class="no-contacts">No contacts available for the current agent.</p>
+                    </aura:if>
                 
                 	<div class="ap-pagination">
                         <div
@@ -202,39 +218,48 @@
             <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
                 aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
                 <div class="slds-modal__container">
-                    <header class="slds-modal__header">
-                        <h1 class="slds-modal__title slds-hyphenate">{!v.modalTitle}</h1>
+                    <div style="position: relative;">
+                        <header class="slds-modal__header">
+                            <h1 class="slds-modal__title slds-hyphenate">{!v.modalTitle}</h1>
+                            
+                        </header>
+                        <aura:if isTrue="{!v.isupdatingContact}">
                         
-                    </header>
-                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
-                       <p>
-                           {!v.messageConfirmation}
-                       </p>
-                       <aura:iteration items="{!v.selectedAgentsInfo}" var="con">
-                        <p>
-                            {!con.Name} - {!con.Email}
-                        </p>
-                       </aura:iteration>
-                    </div>
-                    <footer class="slds-modal__footer">
-                        <lightning:button variant="base" 
-                        label="cancel" title="Deactivate selected"
-                        onclick="{! c.closeModal }" />
-                        <aura:if isTrue="{!v.isDeactivateAction}">
-                            <lightning:button variant="brand" 
-                                                    label="Deactivate" title="Deactivate"
-                                                    onclick="{! c.handleDeactivateAgents }" />
-                            <aura:set attribute="else">                        
-                                <lightning:button variant="brand" 
-                                                    label="Verify" title="Verify"
-                                                    onclick="{! c.handleVerifyAgents }" />
-                            </aura:set>
+                                <lightning:spinner alternativeText="Loading" size="small" variant="brand"/>
+                        
                         </aura:if>
-                      </footer>
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                            
+                        <p>
+                            {!v.messageConfirmation}
+                        </p>
+                        <aura:iteration items="{!v.selectedAgentsInfo}" var="con">
+                            <p>
+                                {!con.Name} - {!con.Email}
+                            </p>
+                        </aura:iteration>
+                        </div>
+                        <footer class="slds-modal__footer">
+                            <lightning:button variant="base" 
+                            label="Cancel" class="slds-button slds-button ap-btn ap-btn-outline" title="Cancel"
+                            onclick="{! c.closeModal }" />
+                            <aura:if isTrue="{!v.isDeactivateAction}">
+                                <lightning:button variant="brand" 
+                                                        label="Deactivate" class="slds-button slds-button ap-btn" title="Deactivate"
+                                                        onclick="{! c.handleDeactivateAgents }" />
+                                <aura:set attribute="else">                        
+                                    <lightning:button variant="brand" 
+                                                        label="Verify" class="slds-button slds-button ap-btn" title="Verify"
+                                                        onclick="{! c.handleVerifyAgents }" />
+                                </aura:set>
+                            </aura:if>
+                        </footer>
+                    </div>
                 </div>
             </section>
             <div class="slds-backdrop slds-backdrop_open"></div>
         </aura:if>
     </aura:if>
+    
     
 </aura:component>

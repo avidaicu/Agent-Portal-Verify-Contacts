@@ -1,29 +1,34 @@
 ({
     doInit : function(component, event, helper) {
+        component.set("v.isFetching", true);
         var action = component.get('c.getListAgentUrns');
         action.setCallback(this, function(response) {
             var state = response.getState();
-            
+            component.set("v.isFetching", false);
             if (state === "SUCCESS"){
                
                component.set("v.mainContact", response.getReturnValue().mainContact);
                component.set("v.agentList", response.getReturnValue().agentList);
-                
-               console.log(response.getReturnValue().contactList);
                component.set("v.contactListSearched", response.getReturnValue().contactList);
+                console.log('response.getReturnValue().agentList: ', response.getReturnValue().agentList);
                 if(response.getReturnValue().agentList.length <= 1){
                     helper.handleFilter(component);
                     component.set('v.selectedURN', response.getReturnValue().agentList[0].Agent_URN__c);
                 }
+                if(response.getReturnValue().contactList.length === 0){
+                    component.set("v.doesContactsExist",true);
+                }
             }else{
-                helper.showToast("Error!", response.getError()[0].message ,"error", "sticky");
+                helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
+            
         });
         
         $A.enqueueAction(action);
     },
     
     manageAgents : function(component, event, helper) {
+        component.set("v.isFetching", true);
         // innitate action, call the apex method getListContactByAgent
         var action = component.get('c.getListContactByAgent');
         // get the urn when button is clicked
@@ -42,8 +47,9 @@
                 component.set("v.contactListSearched", response.getReturnValue());
                 helper.handleFilter(component);
             }else{
-                helper.showToast("Error!", response.getError()[0].message ,"error", "sticky");
+                helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
+            component.set("v.isFetching", false);
         });
         // enqueue action to invoke apex code
         $A.enqueueAction(action);
@@ -70,10 +76,6 @@
         } else {
             component.set("v.isChecked", false);
         }
-        
-       console.log('selectedAgents:', selectedAgents.size);
-       console.log(contactId);
-       console.log(component.get("v.isChecked"));
         
        	var el = document.getElementsByClassName(contactId);
         if(ischecked){
@@ -104,12 +106,16 @@
             var contacts = component.get("v.activeContactsRendered");
 
             contacts.forEach(contact => {
-                selectedAgents.add(contact.Id);
+                if(contact.Requires_verification__c){
+                    selectedAgents.add(contact.Id);
+                }
+                
             });
+
             if(component.find("checkContact")){
                 checkedBoxes = component.find("checkContact");
                 checkedBoxes.forEach(row=>{
-                    if(!row.get("v.checked")){
+                    if(!row.get("v.checked") && selectedAgents.has(row.get("v.value"))){
                         row.set("v.checked",true);
                     }
                 });
@@ -119,17 +125,11 @@
                 component.set("v.isChecked", true);
             }
                 
-            // var toggleText = component.find("allSelectedRows");
-            // if(ischecked){
-            //    toggleText.forEach(el => $A.util.toggleClass(el, "selected"));
-            // }
-                
-            }
-
-        console.log('selectedUrns : ' + selectedUrns);
+        }
                
      },
      searchContact : function(component, event, helper) {
+        component.set("v.isFetching", true);
         var action = component.get('c.getContactsByEmailName');
 
         // pass the agent urn as param into apex action
@@ -146,17 +146,17 @@
                 helper.handleFilter(component);
                 
             }else{
-                helper.showToast("Error!", response.getError()[0].message ,"error", "sticky");
+                helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
+            component.set("v.isFetching", false);
         });
         // enqueue action to invoke apex code
         $A.enqueueAction(action);
      },
                 
      deactivateAgents : function(component, event, helper) {
+        
         let contactId = event.getSource().get("v.value");
-        console.log('contactId : ' + contactId);
-
         var selectedAgentIds = [];
         
         if(contactId){
@@ -164,7 +164,6 @@
         }else{
             selectedAgentIds = Array.from(component.get("v.selectedContactIds"));
         }
-        console.log('selectedAgents : ' + selectedAgentIds);
         let contacts = component.get("v.contactListSearched");
         let selectedAgentsInfo = contacts.filter(con =>selectedAgentIds.includes(con.Id) && !con.Has_left_organisation__c && !con.Requires_verification__c);
         component.set("v.selectedAgentsInfo", selectedAgentsInfo);
@@ -175,15 +174,13 @@
             component.set("v.isDeactivateAction",true);
         }else{
             // show message no agent is selected
-            helper.showToast("Warning!", "Selected Agents are not Active." ,"warning", "sticky");
+            helper.showToast("Warning!", "Selected Agents are not Active." ,"warning", "dismissible",15000);
         }
      },
 
      verifyAgents : function(component, event, helper) {
         
         let contactId = event.getSource().get("v.value");
-        console.log('contactId : ' + contactId);
-
         var selectedAgentIds = [];
         
         if(contactId){
@@ -191,7 +188,6 @@
         }else{
             selectedAgentIds = Array.from(component.get("v.selectedContactIds"));
         }
-        console.log('selectedAgents : ' + selectedAgentIds);
         let contacts = component.get("v.contactListSearched");
         let selectedAgentsInfo = contacts.filter(con =>selectedAgentIds.includes(con.Id) && con.Requires_verification__c && !con.Has_left_organisation__c);
         component.set("v.selectedAgentsInfo", selectedAgentsInfo);
@@ -203,10 +199,11 @@
 
         }else{
             // show message no agent is selected
-            helper.showToast("Warning!", "Selected Agents are verified  already." ,"warning", "sticky");
+            helper.showToast("Warning!", "Selected Agents are verified  already." ,"warning", "dismissible",15000);
         }
      },
      handleVerifyAgents: function(component, event, helper){
+        component.set("v.isupdatingContact", true);
         // innitate action, call the apex method getListContactByAgent
         var action = component.get('c.verifyContacts');
         var selectedAgentsInfo = Array.from(component.get("v.selectedAgentsInfo"));
@@ -225,41 +222,44 @@
             if (state === "SUCCESS"){                
                 component.set("v.contactListSearched", response.getReturnValue());
                 helper.handleFilter(component);
-                
+                helper.showToast("Success!", 'The agents have been verified sucessfully!' ,"success", "dismissible",15000);
             }else{
-                helper.showToast("Error!", response.getError()[0].message ,"error", "sticky");
+                helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
-              
+            component.set("v.isupdatingContact", false);  
         });
         // enqueue action to invoke apex code
         $A.enqueueAction(action);
    },
    handleDeactivateAgents: function(component, event, helper){
-       // innitate action, call the apex method getListContactByAgent
-       var action = component.get('c.deactivateContacts');
-       var selectedAgentsInfo = Array.from(component.get("v.selectedAgentsInfo"));
-       var selectedAgents = [];
-       selectedAgentsInfo.forEach(con=>{
-           selectedAgents.push(con.Id);
-       });  
-       action.setParams({
-           "contactIds" : selectedAgents,
-           "agentUrn":  component.get('v.selectedURN')
-       });
-       // handle response
-       action.setCallback(this, function(response) {
-           var state = response.getState();
-          component.set("v.openModal", false);
-          component.set("v.isDeactivateAction",false);
-           if (state === "SUCCESS"){                
-               component.set("v.contactListSearched", response.getReturnValue());
-               helper.handleFilter(component);
-           }else{
-                helper.showToast("Error!", response.getError()[0].message ,"error", "sticky");
-               
-           }
-             
-       });
+        component.set("v.isupdatingContact", true);
+        // innitate action, call the apex method getListContactByAgent
+        var action = component.get('c.deactivateContacts');
+        var selectedAgentsInfo = Array.from(component.get("v.selectedAgentsInfo"));
+        var selectedAgents = [];
+        selectedAgentsInfo.forEach(con=>{
+            selectedAgents.push(con.Id);
+        });  
+        action.setParams({
+            "contactIds" : selectedAgents,
+            "agentUrn":  component.get('v.selectedURN')
+        });
+        // handle response
+        action.setCallback(this, function(response) {
+            var state = response.getState();
+            component.set("v.openModal", false);
+            component.set("v.isDeactivateAction",false);
+            if (state === "SUCCESS"){                
+                component.set("v.contactListSearched", response.getReturnValue());
+                helper.handleFilter(component);
+                helper.showToast("Success!", 'The agent has been deactivated sucessfully!' ,"success", "dismissible",15000);
+            }else{
+                helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
+                
+            }
+            component.set("v.isupdatingContact", false);
+                
+        });
        // enqueue action to invoke apex code
        $A.enqueueAction(action);
     },

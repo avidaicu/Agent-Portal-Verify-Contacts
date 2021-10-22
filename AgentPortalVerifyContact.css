@@ -355,6 +355,42 @@
     height: 10px;
 }
 
+.THIS.slds-modal .slds-modal__header,
+.THIS.slds-modal .slds-modal__footer {
+    border: none;
+}
+
+.THIS.slds-modal .slds-modal__header {
+    background: #0099d8;
+    color: #fff;
+    border: none;
+}
+
+.THIS.slds-modal .slds-modal__header h1{
+   font-weight: normal;
+   font-size: 28px;
+   padding: 0;
+   margin-bottom: 0 !important; 
+}
+
+.THIS.slds-modal .slds-modal__footer .ap-btn {
+    margin-bottom: 0;
+    border: solid 2px #0099d8;
+    line-height: 18px;
+    vertical-align: initial;
+    font-size: 18px;
+    font-family: "HelveticaNeueW01-Thin";
+}
+
+.THIS.slds-modal .slds-modal__footer .ap-btn-outline {
+   	background-color: #fff;
+    color: #0099d8;
+}
+
+.THIS .no-contacts {
+    margin-top: 20px;
+}
+
 @media(max-width: 767px) {
     
     .THIS.ap-verify-contacts {
@@ -381,7 +417,7 @@
     
     .THIS.manage-agents .ap-agent-details {
         width: 100%;
-        padding-right:50px;
+        padding-right: 0;
     }
     
     .THIS.manage-agents .ap-agent-details h1 {
@@ -402,6 +438,7 @@
     .THIS .ap-filter {
         margin-left: 0;
         margin-bottom: 5px;
+        width: 100%;
     }
     
     .THIS.ap-verify-contacts .slds-float_right {
@@ -427,6 +464,84 @@
     
     .THIS .ap-btn + .ap-btn {
         margin-left: 0!important;
+    }
+    
+    .THIS.manage-agents .ap-agent-details .ap-btn {
+        top: 0;
+    	bottom: initial;
+    }
+    
+    .THIS.manage-agents .search-contact {
+        width: 100%;
+    }
+
+    
+    .THIS .search-filter-container {
+        padding-bottom: 80px;
+    }
+    
+    /*
+    .THIS .ap-verify-contacts table.ap-select-agency thead {
+        display: none !important;
+    }
+    */
+    
+    .THIS .ap-verify-contacts table.ap-select-agency thead tr td{
+        display: none;
+    }
+    
+    .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child{
+        display: block;
+        border:none;
+    }
+    
+    .THIS .ap-verify-contacts table tbody,
+    .THIS .ap-verify-contacts table tr,
+    .THIS .ap-verify-contacts table td {
+        display: block;
+        width: 100% !important;
+        float: right;
+    }
+
+    .THIS .ap-verify-contacts table tr {
+        position: relative;
+        margin-bottom: 15px;
+        padding:20px;
+        border:1px solid #f0f0f0;
+    }
+    
+    .THIS .ap-verify-contacts table td {
+        text-align: right;
+        padding-left: 40%;
+    }
+    
+    .THIS .ap-verify-contacts table td .slds-checkbox__label .slds-checkbox_faux,
+    .THIS .ap-verify-contacts table td .slds-checkbox__label .slds-form-element__label{
+        margin:0 !important;
+        padding:0;
+    }
+    
+    .THIS .ap-verify-contacts table tr:nth-child(:first-child) {
+        text-align: center;
+    }
+    
+    .THIS .ap-verify-contacts table tr td:first-child {
+        padding-left: 0 !important;
+    }
+    
+    .THIS .ap-verify-contacts table tr td:last-child {
+        padding-right: 0 !important;
+        border-bottom:none;
+    }
+    
+    .THIS .ap-verify-contacts table tr td:last-child button{
+        margin-right: 0;
+    }
+
+    .THIS .ap-verify-contacts table td::before {
+        content: attr(data-name);
+        position: absolute;
+        left: 20px;
     }
 
 }

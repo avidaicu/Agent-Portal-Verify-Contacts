@@ -1,5 +1,5 @@
 ({  maxPaginatedPages: 5,
-    transactionsPerPage: 50,
+    transactionsPerPage: 10,
     helperMethod : function(component, contacts) {
 		// Display first batch of contacts
 		//let totalPages = Math.ceil(contacts.length / this.transactionsPerPage);
@@ -36,13 +36,14 @@
         const pagesArray = pagesArrayStarter.map(function (x, i) { return (i + startAt) });
         component.set('v.pagesArray', pagesArray);
     },
-   showToast : function(title, message,type, mode) {
+   showToast : function(title, message,type, mode, duration) {
         var toastEvent = $A.get("e.force:showToast");
         toastEvent.setParams({
             "title": title,
             "message": message,
             "type" : type,
-            "mode": mode
+            "mode": mode,
+            "duration":duration
         });
         toastEvent.fire();
     },
