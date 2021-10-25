@@ -11,7 +11,7 @@
                component.set("v.agentList", response.getReturnValue().agentList);
                component.set("v.contactListSearched", response.getReturnValue().contactList);
                 console.log('response.getReturnValue().agentList: ', response.getReturnValue().agentList);
-                if(response.getReturnValue().agentList.length <= 1){
+                if(response.getReturnValue().agentList.length == 1){
                     helper.handleFilter(component);
                     component.set('v.selectedURN', response.getReturnValue().agentList[0].Agent_URN__c);
                 }
@@ -70,7 +70,16 @@
        }
        
         component.set("v.selectedContactIds", selectedAgents);
-        
+        var contacts = component.get("v.contactList");
+        contacts.forEach(contact => {
+            if(contact.Requires_verification__c && selectedAgents.has(contact.Id)){
+                contact.isChecked = true;
+            }else{
+                contact.isChecked = false;
+            }
+            
+        });
+        component.set("v.contactList", contacts);
         if(selectedAgents.size >= 1){
             component.set("v.isChecked", true);
         } else {
@@ -86,10 +95,11 @@
     },
     clickAll : function(component, event, helper) {
         // get value 
-        var contactId = event.getSource().get("v.value"); 
         var ischecked = event.getSource().get("v.checked"); 
+        component.set("v.isCheckedAll",ischecked);
         var selectedAgents = new Set();
         var checkedBoxes;
+        var contacts = component.get("v.contactList");
         if(!ischecked){
             component.set("v.isChecked", false);
             component.set("v.selectedContactIds", null);
@@ -101,14 +111,13 @@
                     }
                 });
             }
-        }else{
             
-            var contacts = component.get("v.activeContactsRendered");
-
+        }else{
             contacts.forEach(contact => {
                 if(contact.Requires_verification__c){
                     selectedAgents.add(contact.Id);
                 }
+
                 
             });
 
@@ -126,12 +135,23 @@
             }
                 
         }
+        contacts.forEach(contact => {
+            if(contact.Requires_verification__c && selectedAgents.has(contact.Id)){
+                contact.isChecked = true;
+            }else{
+                contact.isChecked = false;
+            }
+            
+        });
                
      },
      searchContact : function(component, event, helper) {
         component.set("v.isFetching", true);
         var action = component.get('c.getContactsByEmailName');
-
+        component.set("v.selectedContactIds", null);
+        component.set("v.isChecked", false);
+        component.find("checkAll").set("v.checked",false);
+        component.set("v.isCheckedAll",false);
         // pass the agent urn as param into apex action
          action.setParams({
              "searchTerm":component.get('v.searchTerm'),
@@ -268,11 +288,11 @@
 
     },
     setView: function(component, event, helper) {
-        component.set("v.selectedContactIds", new Set());
-        component.set("v.isChecked", false);
-        component.find("checkAll").set("v.checked",false);
+        //component.set("v.selectedContactIds", null);
+       // component.set("v.isChecked", false);
+       // component.find("checkAll").set("v.checked",false);
 
-        var checkedBoxes;
+        /*var checkedBoxes;
         if(component.find("checkContact")){
             checkedBoxes = Array.from(component.find("checkContact"));
             checkedBoxes.forEach(row=>{
@@ -280,7 +300,7 @@
                     row.set("v.checked",false);
                 }
             });
-        }
+        }*/
         
         
         helper.handleFilter(component);
@@ -288,7 +308,21 @@
     },
             
     getPage: function (component, event, helper) {
-        component.find("checkAll").set("v.checked",false);
+        
         helper.pageContacts(component, event.getSource().get("v.value"));
-    }
+    },
+    doneRendering :function (component, event, helper) {
+        component.find("checkAll").set("v.checked",component.get("v.isCheckedAll"));
+    
+        var selectedAgents = new Set(component.get("v.selectedContactIds"));
+        if(component.find("checkContact")){
+            checkedBoxes = component.find("checkContact");
+            checkedBoxes.forEach(row=>{
+                if(!row.get("v.checked") && selectedAgents.has(row.get("v.value"))){
+                    row.set("v.checked",true);
+                }
+            });
+        }
+       
+    },
 })

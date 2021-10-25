@@ -35,6 +35,8 @@
         const pagesArrayStarter = Array.apply(null, Array(noOfPages)).map(function () { });
         const pagesArray = pagesArrayStarter.map(function (x, i) { return (i + startAt) });
         component.set('v.pagesArray', pagesArray);
+       
+        
     },
    showToast : function(title, message,type, mode, duration) {
         var toastEvent = $A.get("e.force:showToast");
@@ -49,7 +51,7 @@
     },
     handleFilter : function(component){
         var vieMode = component.get("v.filterView");
-        var contacts = component.get("v.contactListSearched");
+        var contacts =  component.get("v.contactListSearched");
         var totalPages = Math.ceil(contacts.length/this.transactionsPerPage);
         component.set("v.contactList", contacts);
         if(vieMode == 'Active'){
