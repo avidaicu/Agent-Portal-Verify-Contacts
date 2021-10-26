@@ -58,7 +58,19 @@
 
 .THIS .ap-verify-contacts table.ap-select-agency td:first-child{
 	padding-left: 20px;  
-    width: 60px;
+    position: relative;
+    width: 110px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:first-child .info{
+	position: absolute;
+    top: 5px;
+    left: 42px;
+}
+
+.THIS .ap-verify-contacts table.ap-select-agency td:first-child .info svg{
+	height: 18px;
+    width: 18px;
 }
 
 .THIS .ap-verify-contacts table.ap-select-agency td:nth-child(2) {
@@ -174,6 +186,7 @@
 
 .THIS.manage-agents .search-contact input{
     width: 280px;
+    box-sizing: border-box;
 }
 
 
@@ -186,13 +199,34 @@
     position: relative;
 }
 
-.THIS.manage-agents .ap-agent-details .ap-btn{
-    position: absolute;
+.THIS.manage-agents .ap-agent-details .header-verify-agents {
+ 	position: absolute;
     bottom: 0;
-    right: 0;
-    font-size: 18px;
+    right: 0;   
+}
+
+.THIS.manage-agents .ap-agent-details .ap-btn{
     margin: 0;
     font-family: "HelveticaNeueW01-Thin";
+    background: #009adb;
+    border-radius: 40px;
+    font-size: 18px;
+    padding: 10px 20px;
+    line-height: 30px;
+    height: initial;
+    border: none; 
+    float:right;
+}
+
+.THIS.manage-agents .ap-agent-details p{
+	display: inline-block;
+    float: left;
+    margin-right: 20px;
+    text-align: right;
+    line-height: 50px;
+    margin-bottom: 0;
+    font-size: 16px;
+    color: #777;
 }
 
 .THIS .slds-button-group-list .slds-button.is-active {
@@ -208,16 +242,33 @@
     margin-bottom:30px;
 }
 
+.THIS .ap-pagination > p{
+    display:none;
+    font-size: 16px;
+    color: #777;
+}
+
 .THIS .slds-button-group-list li {
     margin: 0 0 0 5px;
 }
 
-.THIS .ap-pagination .slds-button {
+.THIS .ap-pagination .slds-button{
     min-width: 40px;
     min-height: 40px;
     transition: all .3s;
-    padding-bottom:0;
-    margin-bottom:0;
+}
+
+.THIS .ap-pagination button.ap-btn {
+    display:none;
+	background: #009adb;
+    border-radius: 40px;
+    font-size: 18px;
+    font-family: "HelveticaNeueW01-Thin"!important;
+    padding: 10px 20px;
+    line-height: 30px;
+    color: #fff;
+    height: initial;
+    border: none;   
 }
 
 /**
@@ -387,8 +438,30 @@
     color: #0099d8;
 }
 
-.THIS .no-contacts {
-    margin-top: 20px;
+.THIS.no-contacts {
+    padding: 0;
+    display: -webkit-flexbox;
+    display: -moz-flex;
+    display: flex;
+}
+
+.THIS.no-contacts p{
+    margin: 0;
+    padding:20px;
+}
+
+.THIS .no-contacts-icon {
+    background: #d9534f;
+    min-width: 80px;
+    width: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.THIS .no-contacts-icon .fa{
+    font-size: 30px;
+    color: #fff;
 }
 
 @media(max-width: 767px) {
@@ -466,12 +539,17 @@
         margin-left: 0!important;
     }
     
+    .THIS .header-verify-agents {
+       display:none;
+    }
+    
     .THIS.manage-agents .ap-agent-details .ap-btn {
         top: 0;
     	bottom: initial;
     }
     
-    .THIS.manage-agents .search-contact {
+    .THIS.manage-agents .search-contact,
+    .THIS.manage-agents .search-contact input{
         width: 100%;
     }
 
@@ -489,10 +567,14 @@
     .THIS .ap-verify-contacts table.ap-select-agency thead tr td{
         display: none;
     }
-    
+   
     .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child{
         display: block;
         border:none;
+    }
+    
+    .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child .info{
+       left: 89px;
     }
     
     .THIS .ap-verify-contacts table tbody,
@@ -543,6 +625,24 @@
         position: absolute;
         left: 20px;
     }
+    
+    .THIS .ap-verify-contacts table td:first-child::before {
+        left: 0;
+    }
+    
+    .THIS .ap-pagination{
+    	margin-bottom: 0;
+    	margin-top: 15px; 
+	}
+    
+    .THIS .ap-pagination > p{
+    	display: block;
+	}
+    
+    .THIS .ap-pagination button.ap-btn {
+    	display: inline-block;
+    	margin-right: 0; 
+	}
 
 }
 

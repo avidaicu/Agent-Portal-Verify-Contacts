@@ -60,6 +60,8 @@
        var contactId = event.getSource().get("v.value"); 
        var ischecked = event.getSource().get("v.checked"); 
        var selectedAgents = new Set(component.get("v.selectedContactIds"));
+        
+      
        
        component.set("v.ischecked", ischecked);
        
@@ -70,6 +72,13 @@
        }
        
         component.set("v.selectedContactIds", selectedAgents);
+        
+        if(selectedAgents.size >= 1){
+            component.set("v.isChecked", true);
+        } else {
+            component.set("v.isChecked", false);
+        }
+        
         var contacts = component.get("v.contactList");
         contacts.forEach(contact => {
             if(contact.Requires_verification__c && selectedAgents.has(contact.Id)){
