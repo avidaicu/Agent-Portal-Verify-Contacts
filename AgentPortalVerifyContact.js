@@ -10,7 +10,14 @@
                component.set("v.mainContact", response.getReturnValue().mainContact);
                component.set("v.agentList", response.getReturnValue().agentList);
                component.set("v.contactListSearched", response.getReturnValue().contactList);
+               component.set("v.timezone", response.getReturnValue().timezone)
                 console.log('response.getReturnValue().agentList: ', response.getReturnValue().agentList);
+                if(!response.getReturnValue().agentList || response.getReturnValue().agentList.length == 0){
+                    component.set("v.isAuthorised", false);
+                }else{
+                    component.set("v.isAuthorised", true);
+                }
+                
                 if(response.getReturnValue().agentList.length == 1){
                     helper.handleFilter(component);
                     component.set('v.selectedURN', response.getReturnValue().agentList[0].Agent_URN__c);

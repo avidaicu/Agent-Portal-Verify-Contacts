@@ -10,7 +10,7 @@
     
     /**
      * Returns the selected transactions by page and page size
-     * @param {Object} component AgentPortalFinance component instance
+     * @param {Object} component AgentPortalVerifyContact component instance
      * @param {integer} pageNum The page number
      */
     pageContacts: function (component, pageNum) {
