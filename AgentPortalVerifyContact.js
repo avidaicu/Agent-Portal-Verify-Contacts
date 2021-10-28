@@ -62,14 +62,13 @@
         $A.enqueueAction(action);
     },
 
+    /*
     clickContact : function(component, event, helper) {
        // get value 
        var contactId = event.getSource().get("v.value"); 
        var ischecked = event.getSource().get("v.checked"); 
        var selectedAgents = new Set(component.get("v.selectedContactIds"));
-        
-      
-       
+
        component.set("v.ischecked", ischecked);
        
        if(ischecked){
@@ -79,12 +78,6 @@
        }
        
         component.set("v.selectedContactIds", selectedAgents);
-        
-        if(selectedAgents.size >= 1){
-            component.set("v.isChecked", true);
-        } else {
-            component.set("v.isChecked", false);
-        }
         
         var contacts = component.get("v.contactList");
         contacts.forEach(contact => {
@@ -161,12 +154,13 @@
         });
                
      },
+     */
      searchContact : function(component, event, helper) {
         component.set("v.isFetching", true);
         var action = component.get('c.getContactsByEmailName');
         component.set("v.selectedContactIds", null);
         component.set("v.isChecked", false);
-        component.find("checkAll").set("v.checked",false);
+        //component.find("checkAll").set("v.checked",false);
         component.set("v.isCheckedAll",false);
         // pass the agent urn as param into apex action
          action.setParams({
@@ -208,7 +202,8 @@
             component.set("v.modalTitle", "Deactivate agent");
             component.set("v.messageConfirmation", "Are you sure you want to deactivate the following agents? They will no longer have access to the Agent Portal. You will not able to active this agent in future. In Order to activate you would need to raise support request with your Study Group sales representative.");
             component.set("v.isDeactivateAction",true);
-        }else{
+        }
+         else{
             // show message no agent is selected
             helper.showToast("Warning!", "Selected Agents are not Active." ,"warning", "dismissible",15000);
         }
@@ -327,8 +322,9 @@
         
         helper.pageContacts(component, event.getSource().get("v.value"));
     },
+    
     doneRendering :function (component, event, helper) {
-        component.find("checkAll").set("v.checked",component.get("v.isCheckedAll"));
+        //component.find("checkAll").set("v.checked",component.get("v.isCheckedAll"));
     
         var selectedAgents = new Set(component.get("v.selectedContactIds"));
         if(component.find("checkContact")){
@@ -341,4 +337,5 @@
         }
        
     },
+    
 })

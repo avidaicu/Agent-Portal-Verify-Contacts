@@ -57,39 +57,22 @@
 }
 
 .THIS .ap-verify-contacts table.ap-select-agency td:first-child{
-	padding-left: 20px;  
-    position: relative;
-    width: 110px;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency td:first-child .info{
-	position: absolute;
-    top: 5px;
-    left: 42px;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency td:first-child .info svg{
-	height: 18px;
-    width: 18px;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(2) {
+	padding-left: 20px;
     width: 280px;
 }
-
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(3) {
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(2) {
     width: 340px;
 }
 
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(4) {
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(3) {
     width: 170px;
 }
 
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(5) {
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(4) {
     width: 140px;
 }
 
-.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(6) {
+.THIS .ap-verify-contacts table.ap-select-agency td:nth-child(5) {
     width: 60px;
 }
 
@@ -558,25 +541,21 @@
         padding-bottom: 80px;
     }
     
-    /*
     .THIS .ap-verify-contacts table.ap-select-agency thead {
         display: none !important;
     }
-    */
     
     .THIS .ap-verify-contacts table.ap-select-agency thead tr td{
         display: none;
     }
-   
+    
+    /*
     .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child{
         display: block;
         border:none;
     }
-    
-    .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child .info{
-       left: 89px;
-    }
-    
+    */
+
     .THIS .ap-verify-contacts table tbody,
     .THIS .ap-verify-contacts table tr,
     .THIS .ap-verify-contacts table td {
@@ -624,10 +603,6 @@
         content: attr(data-name);
         position: absolute;
         left: 20px;
-    }
-    
-    .THIS .ap-verify-contacts table td:first-child::before {
-        left: 0;
     }
     
     .THIS .ap-pagination{
@@ -693,6 +668,8 @@
   width: 100%;
   overflow: hidden;
 position: relative;
+    
+    width: 100%; height: 60px; z-index:9000
 }
 .THIS .loader-status {
   position: absolute;

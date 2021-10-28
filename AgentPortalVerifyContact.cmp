@@ -6,8 +6,11 @@
     <aura:attribute name ='selectedURN' type="String"/>
     <aura:attribute name ='selectedContactIds' type="Set"/>
     <aura:attribute name ='searchTerm' type="String"/>
+    
+    <!--
     <aura:attribute name="isChecked" type="Boolean" default="false"/>
     <aura:attribute name="isCheckedAll" type="Boolean" default="false"/>
+	-->
     
     <aura:attribute name="isFetching" type="Boolean" default="false"/>
     <aura:attribute name="isupdatingContact" type="Boolean" default="false"/>
@@ -34,44 +37,33 @@
     
     <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
 
-    <!--<aura:if isTrue="{!not(empty(v.selectedURN))}">  
-        <aura:if isTrue="{!v.doesContactsExist}">
-            <div class="no-contacts widget" data-aura-rendered-by="28:2;a">
-                <div class="no-contacts-icon" data-aura-rendered-by="29:2;a">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true" data-aura-rendered-by="30:2;a"></i>
-                </div>
-                <div class="no-contacts-text" data-aura-rendered-by="31:2;a">
-                    <p>No contacts available for the current agent.</p>
-                </div>
+    <!-- No contacts exist -->
+    <aura:if isTrue="{!and(not(empty(v.selectedURN)), empty(v.contactList))}">
+        <div class="no-contacts widget" data-aura-rendered-by="28:2;a">
+            <div class="no-contacts-icon" data-aura-rendered-by="29:2;a">
+                <i class="fa fa-exclamation-circle" aria-hidden="true" data-aura-rendered-by="30:2;a"></i>
             </div>
-        </aura:if>
-    </aura:if>-->
-
-    <aura:if isTrue="{!and(not(empty(v.selectedURN)), empty(v.contactList))}">  
-        
-            <div class="no-contacts widget" data-aura-rendered-by="28:2;a">
-                <div class="no-contacts-icon" data-aura-rendered-by="29:2;a">
-                    <i class="fa fa-exclamation-circle" aria-hidden="true" data-aura-rendered-by="30:2;a"></i>
-                </div>
-                <div class="no-contacts-text" data-aura-rendered-by="31:2;a">
-                    <p>No contacts available for the current agent.</p>
-                </div>
+            <div class="no-contacts-text" data-aura-rendered-by="31:2;a">
+                <p>No contacts available for the current agent.</p>
             </div>
+        </div>
     </aura:if>
 
     <aura:if isTrue="{!v.isFetching}">
-        <div class="slds-m-vertical_medium" style="width: 100%; height: 60px; z-index:9000">
+        <div class="slds-m-vertical_medium loader">
             <lightning:spinner alternativeText="Loading" size="small" />
         </div>
     </aura:if>
+    
     <aura:if isTrue="{!not(v.isAuthorised)}">
         <div class="sgap-content-container">
-            	<!-- Not authorised to view verify contacts page -->
-            	<h1>Insufficient access rights to perform the operation</h1>
-            	<p>Please speak with your main contact at Study Group if you feel this is an error and would like to be granted permission.</p>
-            </div>
+            <!-- Not authorised to view verify contacts page -->
+            <h1>Insufficient access rights to perform the operation</h1>
+            <p>Please speak with your main contact at Study Group if you feel this is an error and would like to be granted permission.</p>
+        </div>
     </aura:if>
   
+    <!-- User needs to select which URN they want to view contacts for -->
     <aura:if isTrue="{!and(v.agentList.length > 1, empty(v.selectedURN))}">
         <div class="sgap-content-container">
             <h1>Select an agency</h1>
@@ -100,38 +92,8 @@
             </table>
         </div>
     </aura:if>
-    <!--<aura:if isTrue="{!and(v.agentList, empty(v.selectedURN))}">
-        	<aura:if isTrue="{!v.agentList.length > 1}">
-                <div class="sgap-content-container">
-                    <h1>Select an agency</h1>
-                    <p>Please select the account you would like to manage agents </p>
-                        <table class="ap-select-agency">
-                            <thead>
-                                <tr>
-                                    <td>URN</td>
-                                    <td>Agency</td>
-                                    <td></td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <aura:iteration items="{!v.agentList}" var="agency">
-                                    <tr>
-                                        <td>{!agency.Agent_URN__c}</td>
-                                        <td>{!agency.Name}</td>
-                                        <td class="slds-text-align_right">
-                                            <lightning:button variant="base" class="ap-btn" value="{!agency.Agent_URN__c}"
-                                                              label="Manage Agents" title=""
-                                                              onclick="{! c.manageAgents }" />
-                                        </td>
-                                    </tr>
-                                </aura:iteration>
-                            </tbody>
-                         </table>
-                    </div>
-                </aura:if>
-     </aura:if>-->
-    
-    <!-- Display Contact List -->
+
+    <!-- Display contacts -->
     <aura:if isTrue="{!not(empty(v.selectedURN))}">
         <div class="sgap-content-container manage-agents">
             <section class="ap-agent-details">
@@ -139,10 +101,12 @@
                 <div class="slds-clearfix header-container">
                     <h1>Manage your Agents</h1>
 
-                    <div class="slds-text-align_right header-verify-agents">                                 
+                    <div class="slds-text-align_right header-verify-agents"> 
+                        <!--
                         <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn' : 'slds-button ap-btn is-disabled'}"
                                           label="Verify selected" title="Verify selected"
                                           onclick="{! c.verifyAgents }" />
+						-->
                         <aura:if isTrue="{!v.selectedContactIds.size >= 1}">
                             <p>{!v.selectedContactIds.size} 
                                 <aura:if isTrue="{!v.selectedContactIds.size == 1}">
@@ -155,10 +119,6 @@
                             </p>
                         </aura:if>
                     </div>
-                    
-                    <!-- <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn alert-outline' : 'slds-button ap-btn alert-outline is-disabled'}"
-                                            label="Deactivate selected" title="Deactivate selected"
-                                            onclick="{! c.deactivateAgents }" /> -->
                    
                 </div>
                 
@@ -184,10 +144,12 @@
             <section class="ap-verify-contacts">
                 <table class="ap-select-agency">
                         <thead>
-                            <tr>
+                            <tr> 
+                                <!--
                                 <td data-name="Select all:"><lightning:input aura:id="checkAll" type="checkbox" value="{!v.selectedURN}" onchange="{!c.clickAll}"/>
                                     <lightning:helptext class="info" content="Select/ deselect all unverified agents across all pages."/>
                                 </td>
+								-->
                                 <td>Name</td>
                                 <td>Email</td>
                                 <td>Status</td>
@@ -199,9 +161,11 @@
                         <tbody>
                             <aura:iteration items="{!v.activeContactsRendered}" var="con">
                                 <tr>
-                                    <td data-name="Select:">
-                                        <lightning:input checked="{!con.isChecked}" aura:id="checkContact" disabled="{!!con.Requires_verification__c}" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
-                                    </td>
+                                    <!--
+                                        <td data-name="Select:">
+                                            <lightning:input checked="{!con.isChecked}" aura:id="checkContact" disabled="{!!con.Requires_verification__c}" type="checkbox" value="{!con.Id}" onchange="{!c.clickContact}"/>
+                                        </td>
+									-->
                                     <td data-name="Name:">{!con.Name}</td>
                                     <td data-name="Email:">{!con.Email}</td>
                                     
@@ -233,8 +197,10 @@
                         </tbody>
                     </table>
   
+                	<!-- Pagination -->
                 	<div class="ap-pagination">
                         
+                        <!--
                         <aura:if isTrue="{!v.selectedContactIds.size >= 1}">
                             <p>{!v.selectedContactIds.size} 
                                 <aura:if isTrue="{!v.selectedContactIds.size == 1}">
@@ -250,6 +216,7 @@
                         <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn' : 'slds-button ap-btn is-disabled'}"
                                             label="Verify selected" title="Verify selected"
                                             onclick="{! c.verifyAgents }" />
+						-->
                         
                         <div
                              class="slds-col slds-size_1-of-1">
@@ -286,19 +253,12 @@
                                 </li>
                             </ul>
                         </div>
-                        
-                        <!-- <div class="slds-clearfix">
-                            <div class="slds-float_right">
-                                <lightning:button variant="base" class="{!(v.isChecked) ? 'slds-button ap-btn' : 'slds-button ap-btn is-disabled'}"
-                                label="Verify selected" title="Verify selected"
-                                onclick="{! c.verifyAgents }" />
-                            </div>
-                        </div> -->
                        
                 	</div>
                 
             </section>
         </div>
+        
         <!--Confirm modal-->
         <aura:if isTrue="{!v.openModal}">
             <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small"
