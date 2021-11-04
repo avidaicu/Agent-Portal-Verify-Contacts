@@ -1,0 +1,140 @@
+/**
+ * class name: AgentPortalVerifyContactController
+ * Test Class: AgentPortalVerifyContactControllerTest
+ * Author: Nga Do
+ * Created Date: 15/10/2021
+ */
+
+public without sharing class AgentPortalVerifyContactController {
+   
+    @AuraEnabled
+    public static ContactWrapper getListAgentUrns(){
+
+        ContactWrapper result = new ContactWrapper();
+
+        User currentUser = [Select ContactId,email from User where Id = :userinfo.getUserId()];
+
+        if(String.isBlank(currentUser.ContactId)){
+            throw new AuraHandledException('You are not portal User');
+        }
+        List<Contact> maincontact = [SELECT Id, FirstName, LastName, AccountId, Email, Agent_URN__c, Account.Name, Requires_Verification__c,
+                                        Prime_contact__c,Agent_Contact_Roles__c, Account.Account_Prime_contact__c, CreatedDate
+                                        FROM Contact WHERE ((Id = :currentUser.ContactId and account.Do_Not_Use1__c =false)      
+                                        )limit 1];
+        result.mainContact  = maincontact.isEmpty()? null : maincontact[0];
+       
+        result.agentList = [SELECT Id, Agent_URN__c, Name, Account_Prime_contact__c
+                                        FROM Account 
+                                        WHERE Account.Account_Prime_contact__c =: UserInfo.getUserEmail()];
+                                  
+        Set<Id> accountIds = new Set<Id>(); 
+        for(Account acc: result.agentList){
+            accountIds.add(acc.Id);
+        }
+        if(accountIds.size() <= 1){
+            result.contactList = [SELECT Id, Name, FirstName, LastName, AccountId, Email, Agent_URN__c, Account.Name,Requires_Verification__c,
+                                        Prime_contact__c,Agent_Contact_Roles__c,Account.Account_Prime_contact__c, CreatedDate, Has_left_organisation__c
+                                    FROM Contact 
+                                    WHERE AccountId =: accountIds AND Prime_contact__c != 'Yes' AND Has_left_organisation__c = false ORDER BY CreatedDate DESC];
+        }
+       
+        return result;
+    }
+
+    @AuraEnabled
+    public static List<Contact> getListContactByAgent(string agentUrn){
+
+        return [SELECT Id, Name, FirstName, LastName, AccountId, Email, Agent_URN__c, Account.Name,Requires_Verification__c,
+                                        Prime_contact__c,Agent_Contact_Roles__c,Account.Account_Prime_contact__c, CreatedDate, Has_left_organisation__c
+                                        FROM Contact 
+                                        WHERE Account.Account_Prime_contact__c =: UserInfo.getUserEmail() AND Agent_URN__c =: agentUrn
+                                        AND Prime_contact__c != 'Yes'
+                                        AND Has_left_organisation__c = false ORDER BY CreatedDate DESC
+                                        ];
+
+  
+    }
+
+    @AuraEnabled
+    public static List<Contact> verifyContacts(List<Id> contactIds, String agentUrn){
+        try {
+            List<Contact> contacts = [SELECT Id,Requires_Verification__c
+                                        FROM Contact 
+                                        WHERE Id IN: contactIds 
+                                        AND Account.Account_Prime_Contact__c =: UserInfo.getUserEmail()
+                                        AND Agent_Urn__c =: agentUrn
+                                        AND Requires_Verification__c = true ORDER BY CreatedDate DESC]; 
+            for(Contact c : contacts){
+                c.Requires_Verification__c = false;
+                c.Has_left_organisation__c = false;
+            }
+
+            update contacts;
+            system.debug('contacts' + contacts);
+            system.debug('contactIds' + contactIds);
+            system.debug('agentUrn' + agentUrn);
+            return getListContactByAgent(agentUrn);
+        } catch (System.DmlException e) {
+            throw new AuraHandledException(e.getDmlMessage(0));
+        
+        }catch (Exception ex){
+            throw new AuraHandledException(ex.getMessage());
+        }
+    }
+
+    @AuraEnabled
+    public static List<Contact> deactivateContacts(List<Id> contactIds, string agentUrn){
+        try {
+            List<Contact> contacts = [SELECT Id,Requires_Verification__c
+                                        FROM Contact 
+                                        WHERE Id IN: contactIds 
+                                        AND Account.Account_Prime_Contact__c =: UserInfo.getUserEmail()
+                                        AND Agent_Urn__c =: agentUrn
+                                        AND Requires_Verification__c = false]; 
+            for(Contact c : contacts){
+                c.Requires_Verification__c = true;
+                c.Has_left_organisation__c = true;
+            }
+
+            update contacts;
+            
+            return getListContactByAgent(agentUrn);
+        } catch (System.DmlException e) {
+            throw new AuraHandledException(e.getDmlMessage(0));
+        
+        }
+    }
+
+    @AuraEnabled
+    public static List<Contact> getContactsByEmailName(String searchTerm, String agentUrn){
+        
+        searchTerm = '%' + searchTerm + '%';
+        try {
+            return  [SELECT Id,Name, FirstName, LastName, AccountId, Email, Agent_URN__c, Account.Name,Requires_Verification__c,
+                        Prime_contact__c,Agent_Contact_Roles__c,Account.Account_Prime_contact__c,  CreatedDate
+                    FROM Contact 
+                    WHERE Account.Agent_Urn__c =: AgentUrn AND Account.Account_Prime_Contact__c =: UserInfo.getUserEmail()
+                    AND (Email Like: searchTerm OR Name like: searchTerm)  AND Has_left_organisation__c = false ORDER BY CreatedDate DESC
+                    ];
+            
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+    public class ContactWrapper{
+        @AuraEnabled
+        public Contact mainContact{get;set;}
+        @AuraEnabled
+        public List<Account> agentList{get;set;}
+        @AuraEnabled
+        public List<Contact> contactList{get;set;}
+        @AuraEnabled
+        public string loginUserTimezone{get;set;}
+        puBlic ContactWrapper(){
+            agentList = new List<Account>();
+            contactList = new List<Contact>(); 
+            loginUserTimezone = String.valueOf(UserInfo.getTimeZone());
+        }
+    }
+    
+}
