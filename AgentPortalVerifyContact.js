@@ -185,6 +185,8 @@
      },
                 
      deactivateAgents : function(component, event, helper) {
+        component.set("v.replacedAgent",null);
+        component.set("v.noProvidedReplacer",null);
         
         let contactId = event.getSource().get("v.value");
         var selectedAgentIds = [];
@@ -263,6 +265,12 @@
         $A.enqueueAction(action);
    },
    handleDeactivateAgents: function(component, event, helper){
+        let replacedAgent = component.get("v.replacedAgent");
+        component.set("v.noProvidedReplacer",null);
+        if(!replacedAgent){
+            component.set("v.noProvidedReplacer",'Please select an agent from the list.');
+            return;
+        }
         component.set("v.isupdatingContact", true);
         // innitate action, call the apex method getListContactByAgent
         var action = component.get('c.deactivateContacts');
@@ -273,7 +281,8 @@
         });  
         action.setParams({
             "contactIds" : selectedAgents,
-            "agentUrn":  component.get('v.selectedURN')
+            "agentUrn":  component.get('v.selectedURN'),
+            "replacedAgent": replacedAgent
         });
         // handle response
         action.setCallback(this, function(response) {

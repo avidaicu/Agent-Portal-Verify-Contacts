@@ -12,7 +12,7 @@
 }
 
 .THIS .unverified {
-    color: #0099d8;
+    color: #d9534f;
 }
 
 .THIS td {
@@ -165,13 +165,14 @@
     margin: 0;
     border-radius: 6px;
     float: left;
+
 }
 
 .THIS.manage-agents .search-contact input{
-    width: 280px;
     box-sizing: border-box;
-}
+        width: 280px;
 
+}
 
 .THIS.manage-agents .ap-agent-details button,
 .THIS .ap-pagination button{
@@ -407,6 +408,10 @@
    margin-bottom: 0 !important; 
 }
 
+.THIS.slds-modal .slds-modal__content {
+    padding: 25px;
+}
+
 .THIS.slds-modal .slds-modal__footer .ap-btn {
     margin-bottom: 0;
     border: solid 2px #0099d8;
@@ -419,6 +424,34 @@
 .THIS.slds-modal .slds-modal__footer .ap-btn-outline {
    	background-color: #fff;
     color: #0099d8;
+}
+
+.THIS.slds-modal .slds-modal__footer {
+    padding: 25px;
+    padding-top: 0;
+}
+
+.THIS.slds-modal .search-contact {
+    width: 70%;
+    padding: 20px;
+    background: #f5f5f5;
+    margin: 0;
+    border-radius: 6px;
+    margin-bottom:10px;
+}
+
+.THIS.slds-modal .search-contact input {
+    width: 280px;
+}
+
+.THIS.slds-modal .search-contact .slds-has-selection input {
+    width: 100%;
+    padding: 0 15px;
+    background: #fff;
+}
+
+.THIS.slds-modal .search-contact + p{
+    color:#d9534f;
 }
 
 .THIS.no-contacts {
@@ -618,6 +651,10 @@
     	display: inline-block;
     	margin-right: 0; 
 	}
+    
+    .THIS.slds-modal .search-contact {
+        width: 100%;
+	}
 
 }
 
@@ -650,12 +687,8 @@
     margin-left: 10px;
 }
 
-.THIS .ap-btn.alert {
-    background: #D9534F;
-}
-
-.THIS .ap-btn.success {
-    background: #649D35;
+.THIS .ap-btn-action {
+    background: #0099d8;
 }
 
 .THIS .loader {

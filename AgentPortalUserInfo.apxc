@@ -1,0 +1,568 @@
+public with sharing class AgentPortalUserInfo {
+    
+	static String apiKey = '2dca36b792644f0798539e2e34aecb16';
+    static String apiEndpointSandbox = 'https://staging.uk.studygroup.com';
+    static String apiEndpointProduction = 'https://www.studygroup.com';
+    
+    @AuraEnabled
+    public static ContactWrapper getListAgentUrns(){
+
+        ContactWrapper result = new ContactWrapper();
+       
+        result.agentList = [SELECT Id, Agent_URN__c, Name, Account_Prime_contact__c
+                                        FROM Account 
+                                        WHERE Account.Account_Prime_contact__c =: UserInfo.getUserEmail()];
+       
+        return result;
+    }
+    
+    @AuraEnabled
+    public static List<Contact> getContactsByEmailName(String searchTerm, String agentUrn){
+        
+        searchTerm = '%' + searchTerm + '%';
+        try {
+            return  [SELECT Id,Name, FirstName, LastName, AccountId, Email, Agent_URN__c, Account.Name,Requires_Verification__c,
+                        Prime_contact__c,Agent_Contact_Roles__c,Account.Account_Prime_contact__c,  CreatedDate
+                    FROM Contact 
+                    WHERE Account.Agent_Urn__c =: AgentUrn AND Account.Account_Prime_Contact__c =: UserInfo.getUserEmail()
+                    AND (Email Like: searchTerm OR Name like: searchTerm)  AND Has_left_organisation__c = false ORDER BY CreatedDate DESC
+                    ];
+            
+        } catch (Exception e) {
+            throw new AuraHandledException(e.getMessage());
+        }
+    }
+    public class ContactWrapper{
+        @AuraEnabled
+        public List<Account> agentList{get;set;}
+        @AuraEnabled
+        public List<Contact> contactList{get;set;}
+        puBlic ContactWrapper(){
+            agentList = new List<Account>();
+        }
+    }
+    
+    /**
+     * This would perform the required actions in order to build up
+     * the brochure integration url
+     **/
+    @AuraEnabled
+    public static String getBrochureUrl() {
+        return 'http://www.studygroup.com/';
+    }
+    
+    /**
+     * Returns the users first name
+     **/
+    @AuraEnabled
+    public static String getFirstName() {
+        system.debug('firstName='+userinfo.getFirstName());
+        return userinfo.getFirstName();
+    }
+    
+    /**
+     * Returns the users full name 
+     **/
+    @AuraEnabled
+    public static String getUserName() {
+        return userinfo.getName();
+    }
+    
+     /**
+     * Returns the users Id
+     **/
+    @AuraEnabled
+    public static String getUserId() {
+        return userinfo.getUserId();
+    }
+     
+     /**
+     * Returns the usres profile Id
+     **/
+    @AuraEnabled
+    public static String getProfileId() {
+        return userinfo.getProfileId();   
+    }
+    
+     
+    @AuraEnabled
+    public static string getUserEmail() { 
+        return userinfo.getUserEmail();
+	}
+    
+    @AuraEnabled
+    public static list<user> getUserinfo() {
+        return [select id,language__c,Preferred_news_categories__c,email, Talent_LMS_Id__c, LMS_Platform__c, MediumPhotoUrl from user where Id = :userinfo.getUserId()];
+    }  
+  
+     /**
+     * Returns the Agent Information  -Rama Added
+     * 
+     **/
+    @AuraEnabled
+     public static Contact getagentInfo() {
+        User userId = [Select ContactId from User where Id = :userinfo.getUserId()];
+        list<Contact> con = [Select Id, firstName, lastName, accountid,email,Agent_URN__c,account.Name,
+                             PSM_Name__c,PSE_Name__c,PSMEmail__c,PSE_Email__c,
+                             account.Bellerbys_Contact_Email__c,account.ISC_UK_Eu_Contact_Email__c,
+                             account.NA_Contact_Email__c,account.ANZ_Contact_Email__c,
+                             account.billingcountry,account.reporting_country__C,account.country_of_residence__C,account.AU_Compliance_Satisfied__c,
+                             Prime_contact__c,Agent_Contact_Roles__c, account.TnC_Is_Valid__c, account.Agreement_Is_Valid__c, account.Agreement_Preference__c,
+                             account.Parent_TnC_Is_Valid__c, account.Parent_Agreement_Is_Valid__c, Account.ParentId,
+                             Account.TM_Area__c, Account.TM_Region__c, Account.TM_SubRegion__c
+                             from contact where id = :userId.ContactId];
+         if (con != null && con.size() > 0) {
+             return con[0];
+         } else {
+             return null;
+         }
+    }
+
+
+    /**
+* Returns the Prime also Callidus Access
+**/
+    @AuraEnabled
+    public static list<Contact> getAllAgentUrns() {
+      AgentPortalGetRelatedAgentURNList cls = new AgentPortalGetRelatedAgentURNList();  
+      return cls.getAllAgentUrns();
+    }
+    
+    @AuraEnabled
+    public static String getAssetLibraryURL(string forward){ 
+        string  AssetURL ='';
+        List<Profile> profileList= [Select Id from Profile where Name=: 'Partner Community Login User' limit 1];
+        User userId = [Select username,firstname,lastname,email from User where Id = :userinfo.getUserId()];
+        If (userinfo.getProfileId() == profileList[0].id)
+            AssetURL = 'username='+userId.email+'&datetime='+Datetime.Now()+'&firstname='+userId.FirstName+'&lastname='+userId.LastName+'&forward='+forward+'&groups=112';
+        else
+           AssetURL = 'username='+userId.email+'&datetime='+Datetime.Now()+'&firstname='+userId.FirstName+'&lastname='+userId.LastName+'&forward='+forward+'&groups=126'; 
+        system.debug(AssetURL);
+        system.debug(forward);
+        //Accessing the Key,IV from the Cusstom settings
+        Assetbankkey__mdt assetbankkeyivval = [ SELECT Key__c,IV__c FROM Assetbankkey__mdt limit 1 ];
+         
+        final string passphrase =assetbankkeyivval.key__c;
+        final string initialisationVector  = assetbankkeyivval.IV__c;
+        final String ALGORITHM_NAME = 'AES128'; 
+        
+        blob key = EncodingUtil.base64Decode(passphrase);
+        blob iv = EncodingUtil.base64Decode(initialisationVector);
+        blob data = blob.valueof(AssetURL);
+        string  encodedURL ='';
+        try{
+             blob encryptedURL = Crypto.encrypt(ALGORITHM_NAME, key, iv, data);
+             encodedURL = EncodingUtil.urlEncode(EncodingUtil.base64Encode(encryptedURL), 'UTF8');
+        } catch(Exception ex) {
+            System.debug(ex);
+        }    
+        return  encodedURL;
+    }
+    
+    @AuraEnabled
+    public static String getCourseFinderURL() {
+              
+        String agentEmail = getUserEmail();
+        String requestBody = '{"UserName": "'+agentEmail+'","Password": "1","DeviceType": "Web"}';
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint('https://coursefinder.studygroup.com/sfapp/coursefinder/portallogin');
+        req.setMethod('POST');
+        req.setBody(requestBody);
+     
+        req.setHeader('Content-Type', 'application/json');
+        
+     	Http http = new Http();
+     	HTTPResponse res = http.send(req);
+
+        String responseJSON = res.getBody();
+        
+        Blob responseBlob = Blob.valueOf(responseJSON);
+        String encodedJSON = EncodingUtil.base64Encode(responseBlob);
+        String urlEncodedJSON = EncodingUtil.urlEncode(encodedJSON, 'UTF-8');
+               
+		return 'https://coursefinder.studygroup.com/portal?token='+urlEncodedJSON;
+    }
+
+    @AuraEnabled
+    public static String getJwt() {
+        Jwt jwtobject = new Jwt();
+        return jwtobject.createToken();
+    }  
+    
+    @AuraEnabled
+    public static String getStaticJwtToken() {
+        return 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiQWdlbnQgUG9ydGFsIiwiaXNzIjoiU2FsZXNmb3JjZSJ9.TPIFsbseksOA0ynWyF98Ww7tUUjvxunk1ErYw1G0NX8';
+    }
+    
+    @AuraEnabled
+    public static Boolean isProduction(){
+	  return (UserInfo.getOrganizationId() == '00D20000000IsquEAC');
+    }
+    
+    @AuraEnabled
+    public static String getRecentlySubmittedApplications(Integer view) {
+        
+        Jwt jwtobject = new Jwt();
+        String token = jwtobject.createToken();
+        Contact con = AgentPortalUserInfo.getagentInfo();
+        list<User> user = AgentPortalUserInfo.getUserinfo();
+        
+        String uId;
+        
+        if (con != null) {
+            if (con.Id != null) {
+                uId = con.Id;
+            } else {
+                return null;
+            }
+        } else if (user[0].Id != null) {
+            uId = user[0].Id;
+        } else {
+            return null;
+        }
+        
+        Integer year = view;
+        String formsAPI = getFormsEndpoint();
+        String apiEndpoint = formsAPI + '.studygroup.com/AgentPortal/Applications/' + uId + '/Submitted/' + year;
+        
+        // Instantiate a new http object
+        Http h = new Http();
+    
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+        HttpRequest req = new HttpRequest();
+        //req.setEndpoint('https://engagedev-studygroup.cs89.force.com/partnerCommunity/resource/1539266257000/stubAgentPortalRecentApplications?t=' + DateTime.now().getTime());
+        
+        req.setEndpoint(apiEndpoint);
+        
+       	req.setHeader('Authorization', 'Bearer '+token);
+        req.setMethod('GET');
+        
+        // Send the request, and return a response
+        HttpResponse res = h.send(req);
+        system.debug(res);
+        return res.getBody();
+        
+    }
+
+	@AuraEnabled
+    public static String getApplications(Boolean getIncomplete, String currentPage, String pageSize){
+               
+        String formsAPI = getFormsEndpoint();
+        
+        Jwt jwtobject = new Jwt();
+        String token = jwtobject.createToken();
+        Contact con = AgentPortalUserInfo.getagentInfo();
+        list<User> user = AgentPortalUserInfo.getUserinfo();
+        
+        // Update to allow for staff
+        String uId;
+        
+        if (con != null) {
+            if (con.Id != null) {
+                uId = con.Id;
+            } else {
+                return null;
+            }
+        } else if (user[0].Id != null) {
+            uId = user[0].Id;
+        } else {
+            return null;
+        }
+               
+       // Build the endpoint
+       String apiEndpoint = formsAPI +  '.studygroup.com/AgentPortal/Applications/' + uId;
+        
+        // Apend page offset to 
+        
+        if(!String.isBlank(currentPage)) {
+            apiEndpoint = apiEndpoint + '/' + currentPage;
+        }
+        
+        if(!String.isBlank(pageSize)) {
+            apiEndpoint = apiEndpoint + '/' + pageSize;
+        }
+        
+        if (getIncomplete) {
+            apiEndpoint = apiEndpoint + '/Incomplete';
+        }
+
+        // Instantiate a new http object
+        Http h = new Http();
+    
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(apiEndpoint);
+        req.setHeader('Authorization', 'Bearer '+token);
+        req.setMethod('GET');
+        
+        // Send the request, and return a response
+        HttpResponse res = h.send(req);
+        return res.getBody();
+            
+    }
+    
+    @AuraEnabled
+    public static String deleteApplication(String env, String applicationId){
+
+        Jwt jwtobject = new Jwt();
+        String token = jwtobject.createToken();
+        Contact con = AgentPortalUserInfo.getagentInfo();
+        list<User> user = AgentPortalUserInfo.getUserinfo();
+        
+        // Update to allow for staff
+        String uId;
+        
+        if (con != null) {
+            if (con.Id != null) {
+                uId = con.Id;
+            } else {
+                return null;
+            }
+        } else if (user[0].Id != null) {
+            uId = user[0].Id;
+        } else {
+            return null;
+        }
+   
+        // Build the endpoint
+        String formsAPI = getFormsEndpoint();
+       	String apiEndpoint = formsAPI + '.studygroup.com/AgentPortal/Application/' + uId + '/'+applicationId;
+        
+        // Instantiate a new http object
+        Http h = new Http();
+    
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(apiEndpoint);
+        req.setHeader('Authorization', 'Bearer '+token);
+        req.setMethod('DELETE');
+        
+        // Send the request, and return a response
+        HttpResponse res = h.send(req);
+        return res.getBody();
+            
+    }
+    
+    @AuraEnabled
+    public static Integer getTrackerCount() {
+        List <Opportunity> oppList = TrackerSystemController.getOpps(0);
+        
+        return (oppList != null && oppList.size() > 0) ? oppList.size() : 0;
+    }
+    
+    /**public static String getBaseApiEndpoint() {
+        return AgentPortalUserInfo.isProduction() ? apiEndpointProduction : apiEndpointSandbox;
+    }**/
+    
+    public static String getBaseApiEndpoint() {
+                
+        String baseUrl = '';
+        String sfBaseUrl = URL.getSalesforceBaseUrl().toExternalForm();
+                
+        if (sfBaseUrl.indexOf('engagedev-studygroup') != -1) {
+            // DEV - Staging
+            baseUrl = 'https://staging.uk.studygroup.com';
+        } else if (sfBaseUrl.indexOf('agent.studygroup.com') != -1) {
+            // PROD - Live
+            baseUrl = 'https://www.studygroup.com';
+        } else {
+            // Catch all for SIT, UAT, PRE PROD
+            baseUrl = 'https://sitecore.uk.studygroup.com';
+        }
+        
+        System.debug(baseUrl);
+        
+        return baseUrl;
+        
+        // Old approach
+        //return isProduction() ? apiEndpointProduction : apiEndpointSandbox;
+    }
+    
+    public static String getFormsEndpoint() {
+        
+        String apiEnvironment;
+        String apiEndpoint = '';
+        String apiProtocol = 'https://';
+        String sfBaseUrl = URL.getSalesforceBaseUrl().toExternalForm();
+        
+        // Engagedev
+        if (sfBaseUrl.indexOf('engagedev-studygroup') != -1) {
+            apiEnvironment = 'formsdev';
+        }
+        
+        // SIT
+        if (sfBaseUrl.indexOf('full-studygroup') != -1) {
+            apiEnvironment = 'formssit';
+        }
+       
+        // UAT
+        if (sfBaseUrl.indexOf('sgpcopyuat-studygroup') != -1) {
+            apiEnvironment = 'formsuat';
+        }
+         
+        // PROD
+        if (sfBaseUrl.indexOf('agent.studygroup.com') != -1) {
+            apiEnvironment = 'forms';
+        }
+                       
+        return apiProtocol + apiEnvironment;
+
+    }
+    
+    @AuraEnabled
+    public static String getPortalConfig(String locale){
+        
+        // Instantiate a new http object
+        Http h = new Http();
+        
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(getBaseApiEndpoint() + '/-/data/?indent=1&type=siteconfig&html=0&key=' + apiKey + '&nocache&rootPath=Agent%20Portal/Home' + '&locale=' + locale);
+        req.setMethod('GET');
+        
+        // Send the request, and return a response
+        HttpResponse res = h.send(req);
+        return res.getBody();
+        
+    }
+    
+    @AuraEnabled
+    public static String getApplicationTemplateText(){
+        
+        // Instantiate a new http object
+        Http h = new Http();
+        
+        // Instantiate a new HTTP request, specify the method (GET) as well as the endpoint
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(getBaseApiEndpoint() + '/-/data/?indent=1&type=agentapplicationform&html=0&key=' + apiKey + '&nocache');
+        req.setMethod('GET');
+        
+        // Send the request, and return a response
+        HttpResponse res = h.send(req);
+        return res.getBody();
+        
+    }
+    
+    @AuraEnabled
+    public static void setPreferredLanguage(String preferredLang){
+        List<Profile> profileList= [Select Id from Profile where Name=: 'Partner Community Login User' limit 1];
+        User u= [select id,language__c,Preferred_news_categories__c from user where Id = :userinfo.getUserId()];
+        if (userinfo.getProfileId()  == profileList[0].id){
+            if (preferredLang == 'English'){
+                u.LanguageLocaleKey ='en_US';
+                u.language__C = 'English';
+            }    
+            else if (preferredLang == 'Chinese'){
+                u.LanguageLocaleKey ='zh_CN';
+                u.language__C = 'Chinese';
+            }   
+            update u;
+            system.debug('Inside setPreferredLanguage');
+        }   
+    }
+    
+    @AuraEnabled
+    public static String talentLMSUserProvisionCheck() {
+        return TalentLMS.userProvisionCheck();
+    }
+    
+    /**
+     * Gets the traing platform for the user
+     * Returns TalentLMS|WeChat|null
+     * If null a selection is required
+     */
+    @AuraEnabled
+    public static String getTrainingPlatform() {
+        // Get the user info - includes their LMS preference
+        list<User> user = AgentPortalUserInfo.getUserinfo();
+                
+        // Return the selection where user has already decided otherwise return null to prompt selection
+        return (user[0].LMS_Platform__c != null) ? user[0].LMS_Platform__c : null;
+    }
+    
+  public Without Sharing class AgentPortalGetRelatedAgentURNList {
+    public list<Contact> getAllAgentUrns() {
+        User userId = [Select ContactId,email from User where Id = :userinfo.getUserId()];
+        List<Contact> finalresult = new List<Contact>();
+        List<Contact> returnresult = new List<Contact>();
+        List<Contact> UrnsInHierarchy = new List<Contact>();
+        Map<Id,Contact> cids = new Map<Id,Contact>();
+        Map<ID,Contact> uniqueconList = new Map<ID,Contact>();
+        Map<ID,Boolean> IsSubmissionTypeContact = new Map<ID,Boolean>();
+        //User userId = [Select ContactId,email from User where Id = '0059E000002r45HQAQ'];  //-->0059E000001kN9pQAE	//0059E000002r45HQAQ	
+        list<Contact> con = [
+            Select Id,accountid,email,Agent_URN__c,account.Name,account.parent.id,account.id,
+            PSM_Name__c,PSE_Name__c,PSMEmail__c,PSE_Email__c,
+            account.Bellerbys_Contact_Email__c,account.ISC_UK_Eu_Contact_Email__c,
+            account.NA_Contact_Email__c,account.ANZ_Contact_Email__c,
+            account.billingcountry,account.reporting_country__C,account.country_of_residence__C,
+            Prime_contact__c,Agent_Contact_Roles__c, account.AU_Compliance_Satisfied__c, account.TnC_Is_Valid__c, account.Agreement_Is_Valid__c, account.Agreement_Preference__c,
+            account.Parent_TnC_Is_Valid__c, account.Parent_Agreement_Is_Valid__c, Account.ParentId
+            from Contact 
+            where Recordtype.Name='Agent Contact Record' And email = :userId.email And IsDeleted =false And Has_left_organisation__c=false And account.Do_Not_Use1__c =false
+        ]; 
+        
+        if (con != null && con.size() > 0) 
+            returnresult.addAll(con);
+        for(Contact c : con){ 
+            cids.put(c.id,c);
+        }    
+        if ( cids != null && !cids.isEmpty() ){
+            system.debug('cids='+cids.keySet());
+            //IsSubmissionTypeContact = IsSubmissionTypeContact(cids.keySet());
+            for (Contact cont : [select Id,accountid,email,Agent_URN__c,account.Name from contact  
+                                 where Recordtype.Name='Agent Contact Record' And Id in :cids.keySet() and Agent_Contact_Roles__c includes ('Student Application Officer') and Has_left_organisation__c=false ]){
+                                     system.debug('IsSubmissionTypeContact='+cont.Id);
+                                     IsSubmissionTypeContact.put(cont.Id,true);
+                                 }
+        }
+        //system.debug('IsSubmissionTypeContacthere='+IsSubmissionTypeContact.keySet());
+        for(Contact c : con){
+            system.debug('Parentid='+c.account.parent.id);
+            system.debug('accid='+c.account.id);
+            system.debug('containskey='+c.id);
+            system.debug('IsSubmissionTypeContact='+IsSubmissionTypeContact.get(c.id));
+            if ( IsSubmissionTypeContact != null && !IsSubmissionTypeContact.isEmpty() ){  
+                if(IsSubmissionTypeContact.containsKey(c.id)&&IsSubmissionTypeContact.get(c.id) && (c.account.parent.id == null )){
+                    UrnsInHierarchy = AllUrnsInHierarchy(c.account.id);
+                    if ( UrnsInHierarchy != null && !UrnsInHierarchy.isEmpty() )
+                        returnresult.addAll(UrnsInHierarchy);
+                }
+            }    
+        }   
+        
+        for(Contact c : returnresult){  
+            uniqueconList.put(c.account.id,c);
+        }    
+        finalresult = uniqueconList.values();
+        
+        if (finalresult != null && finalresult.size() > 1) {
+            return finalresult;
+        } else {
+            return null;
+        }
+    }
+    
+     public list<Contact> AllUrnsInHierarchy(Id Parentid) {
+        Set<Contact> myset = new Set<Contact>();
+        list<Contact> con = [Select Id,accountid,account.parent.id,email,Agent_URN__c,account.Name,
+                             PSM_Name__c,PSE_Name__c,PSMEmail__c,PSE_Email__c,
+                             account.Bellerbys_Contact_Email__c,account.ISC_UK_Eu_Contact_Email__c,
+                             account.NA_Contact_Email__c,account.ANZ_Contact_Email__c,
+                             account.billingcountry,account.reporting_country__C,account.country_of_residence__C,
+                             Prime_contact__c,Agent_Contact_Roles__c,account.AU_Compliance_Satisfied__c,
+                             account.TnC_Is_Valid__c, account.Agreement_Is_Valid__c, account.Agreement_Preference__c,
+                            account.Parent_TnC_Is_Valid__c, account.Parent_Agreement_Is_Valid__c, Account.ParentId from contact  
+                             where account.parent.id = :Parentid and Has_left_organisation__c=false and account.Do_Not_Use1__c =false ];
+        
+        if (con != null && con.size() > 0) {
+            myset.addAll(con);
+            con.addAll(myset);
+            return con;
+        } else {
+            return null;
+        }
+    }  
+}
+  
+ }

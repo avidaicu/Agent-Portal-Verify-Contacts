@@ -6,7 +6,9 @@
     <aura:attribute name ='selectedURN' type="String"/>
     <aura:attribute name ='selectedContactIds' type="Set"/>
     <aura:attribute name ='searchTerm' type="String"/>
-    
+
+    <aura:attribute name ='replacedAgent' type="String"/>
+    <aura:attribute name ='noProvidedReplacer' type="String"/>
     <!--
     <aura:attribute name="isChecked" type="Boolean" default="false"/>
     <aura:attribute name="isCheckedAll" type="Boolean" default="false"/>
@@ -182,11 +184,11 @@
                                     <td class="slds-text-align_right">
                                         
                                         <aura:if isTrue="{!con.Requires_verification__c}">
-                                            <lightning:button variant="base" class="ap-btn success" value="{!con.Id}"
+                                            <lightning:button variant="base" class="ap-btn ap-btn-action" value="{!con.Id}"
                                                 label="Verify" title=""
                                                 onclick="{! c.verifyAgents }" />
                                             <aura:set attribute="else">
-                                            <lightning:button variant="base" class="ap-btn alert" value="{!con.Id}"
+                                            <lightning:button variant="base" class="ap-btn ap-btn-action" value="{!con.Id}"
                                                 label="Deactivate" title=""
                                                 onclick="{! c.deactivateAgents }" />
                                             </aura:set>
@@ -274,7 +276,7 @@
                                 <lightning:spinner alternativeText="Loading" size="small" variant="brand"/>
                         
                         </aura:if>
-                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="overflow:unset !important; overflow-y:initial !important">
                             
                         <p>
                             {!v.messageConfirmation}
@@ -284,6 +286,17 @@
                                 {!con.Name} - {!con.Email}
                             </p>
                         </aura:iteration>
+                        <aura:if isTrue="{!v.isDeactivateAction}">
+                            <p>
+                               Please select an agent to assign this agent application/aplications before deactivate this agent. 
+                            </p>
+                            <div class="search-contact">
+                                <c:AgentPortalContactLookup aura:id="contactLookUp" agentUrn="{!v.selectedURN}" value="{!v.replacedAgent}" excludedContacts="{!v.selectedAgentsInfo}"/>              
+                            </div>
+                            <p>
+                                {!v.noProvidedReplacer}
+                            </p>
+                        </aura:if>
                         </div>
                         <footer class="slds-modal__footer">
                             <lightning:button variant="base" 
