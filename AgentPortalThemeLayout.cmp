@@ -77,8 +77,8 @@
                                     </aura:if>
                                     
                                     <aura:if isTrue="{!v.isAuthorised}">
-                                        <a href="{! v.portalPath + 's/verify-counsellors'}" role="button" class="header-nav-item">
-                                            Verify counsellors 
+                                        <a href="{! v.portalPath + 's/manage-counsellors'}" role="button" class="header-nav-item">
+                                            Manage counsellors 
                                         </a>
                                     </aura:if>
                                     

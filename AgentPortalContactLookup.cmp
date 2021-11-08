@@ -1,0 +1,66 @@
+<aura:component controller="AgentPortalContactLookupController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global">
+    
+    <aura:attribute name="value" type="String" access="public" />
+    
+    <aura:attribute name="excludedContacts" type="List" access="public" />
+    <aura:attribute name="valueLabel" type="String" />
+    <aura:attribute name="limit" type="Integer" access="public" default="5" required="true"/>
+    <aura:attribute name="searchTerm" type="String" access="public" />
+    <aura:attribute name="agentUrn" type="String" access="public" />
+    <aura:attribute name="data" type="List" access="private" />
+    <aura:attribute name="showManu" type="Boolean" default="false"/>
+    <aura:attribute name="isInitiate" type="Boolean" default="false"/>
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:handler name="change" value="{!v.searchTerm}" action="{!c.handleSearchTermChanged}" />
+    
+    <div class="slds-form-element__control">        
+        <div class="{!if(v.value == null,'slds-combobox_container','slds-combobox_container slds-has-selection')}">
+
+            <div class="{!if(and(v.showManu,value == null),'slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click slds-is-open','slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click')}" aria-expanded="false" aria-haspopup="listbox" role="combobox">
+                <aura:if isTrue="{!v.value != null}">
+                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_left-right" role="none">
+                        <input type="text" disabled="true" class="slds-input slds-combobox__input slds-combobox__input-value" id="combobox-id-5" aria-controls="listbox-id-5" autocomplete="off" role="textbox" placeholder="Type to search agents by name or email" readonly=""
+                        value="{!v.valueLabel}"/>
+                        <lightning:buttonIcon class="slds-input__icon slds-input__icon_right" iconName="utility:close" variant="bare" onclick="{! c.handleClickClose}" alternativeText="Settings" title="Settings" />
+
+                    </div>
+                </aura:if>
+                <aura:if isTrue="{!v.value == null}">
+                    <lightning:input aura:id="enter-search" name="enter-search" type="search" value="{!v.searchTerm}" class="search_box"  placeholder ="Type to search agents by name or email" style="width:100%!important" />
+                    <aura:if isTrue="{!v.showManu}">
+                        <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-7 slds-dropdown_fluid" role="listbox">
+                            <ul class="slds-listbox slds-listbox_vertical" role="presentation" style="width:-webkit-fill-available">
+                                <aura:if isTrue="{!not(empty(v.data))}">
+                                    <aura:iteration items="{!v.data}" var="item">
+                                        <li role="presentation" class="slds-listbox__item" data-itemid="{!item.value}" data-label="{!item.label}" onclick="{!c.handleClickItem}" style="width:-webkit-fill-available">
+                                            <div id="option1" class="slds-media slds-listbox__option slds-listbox__option_entity slds-listbox__option_has-meta" role="option">
+                                                <!--
+                                                <span class="slds-media__figure slds-listbox__option-icon">   
+                                                    <lightning:icon iconName="{!v.iconName}" alternativeText="Preview" title="Preview" />
+                                                </span>
+												-->
+                                                <span class="slds-media__body">
+                                                <span class="slds-listbox__option-text slds-listbox__option-text_entity">{!item.label}</span>
+                                                </span>
+                                            </div>
+                                        </li>
+                                    </aura:iteration>
+                                    <aura:set attribute="else">                        
+                                        <li role="presentation" class="slds-listbox__item slds-p-left_large" style="width:-webkit-fill-available">
+                                            <span class="slds-media__body">
+                                            <span class="slds-listbox__option-text slds-listbox__option-text_entity">No Agent Found</span>
+                                            </span>
+                                        </li>
+                                    </aura:set>
+                                </aura:if>
+                                
+                            </ul>
+                        </div>
+                    </aura:if>
+                </aura:if>
+            </div>
+        </div>
+    </div>
+    
+</aura:component>

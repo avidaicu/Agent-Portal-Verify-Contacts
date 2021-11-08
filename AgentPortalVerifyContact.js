@@ -11,7 +11,6 @@
                component.set("v.agentList", response.getReturnValue().agentList);
                component.set("v.contactListSearched", response.getReturnValue().contactList);
                component.set("v.timezone", response.getReturnValue().timezone)
-                console.log('response.getReturnValue().agentList: ', response.getReturnValue().agentList);
                 if(!response.getReturnValue().agentList || response.getReturnValue().agentList.length == 0){
                     component.set("v.isAuthorised", false);
                 }else{
@@ -209,6 +208,12 @@
             // show message no agent is selected
             helper.showToast("Warning!", "Selected Agents are not Active." ,"warning", "dismissible",15000);
         }
+         
+        document.addEventListener('keydown', evt => {
+            if (evt.key === 'Escape') {
+            	component.set("v.openModal",false);
+        	}
+        });
      },
 
      verifyAgents : function(component, event, helper) {
@@ -234,6 +239,12 @@
             // show message no agent is selected
             helper.showToast("Warning!", "Selected Agents are verified  already." ,"warning", "dismissible",15000);
         }
+         
+        document.addEventListener('keydown', evt => {
+            if (evt.key === 'Escape') {
+            	component.set("v.openModal",false);
+        	}
+        });
      },
      handleVerifyAgents: function(component, event, helper){
         component.set("v.isupdatingContact", true);
@@ -305,7 +316,6 @@
     },
     closeModal:function(component, event, helper) {
         component.set("v.openModal",false);
-
     },
     setView: function(component, event, helper) {
         //component.set("v.selectedContactIds", null);

@@ -101,7 +101,7 @@
             <section class="ap-agent-details">
                 
                 <div class="slds-clearfix header-container">
-                    <h1>Manage your Agents</h1>
+                    <h1>Manage counsellors</h1>
 
                     <div class="slds-text-align_right header-verify-agents"> 
                         <!--
@@ -282,7 +282,7 @@
                             {!v.messageConfirmation}
                         </p>
                         <aura:iteration items="{!v.selectedAgentsInfo}" var="con">
-                            <p>
+                            <p class="agents-displayed">
                                 {!con.Name} - {!con.Email}
                             </p>
                         </aura:iteration>

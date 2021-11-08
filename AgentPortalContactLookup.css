@@ -1,0 +1,38 @@
+.THIS .search_box .slds-form-element__label {
+    display: none;
+ }
+ .THIS .search_box .slds-input{
+    width: -webkit-fill-available !important;
+ }
+ .THIS .search-contact,
+ .THIS .search-contact input{
+     width: 100%;
+ }
+
+.THIS .slds-dropdown {
+    padding: 0;
+}
+
+.THIS .slds-dropdown ul{
+    margin: 0;
+}
+
+.THIS .slds-dropdown ul li {
+    padding: 14px;
+    padding-left: 30px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.THIS .slds-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.THIS .slds-dropdown ul li:hover {
+    background-color: var(--lwc-colorBackgroundRowHover,rgba(0, 153, 222, 0.05));
+	cursor:pointer;
+}
+
+.THIS .slds-dropdown .slds-media {
+    padding: 0;
+    background:none;
+}

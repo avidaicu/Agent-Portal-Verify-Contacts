@@ -1,0 +1,86 @@
+/**
+ * class name: AgentPortalContactLookupController
+ * Test Class: AgentPortalContactLookupControllerTest
+ * Author: Nga Do
+ * Created Date: 4/11/2021
+ */
+
+public without sharing  class AgentPortalContactLookupController {
+    @AuraEnabled
+    public static ResultWrapper doSearch(String searchTerm, Integer limitRow, String agentUrn, String value, List<String> excludedContacts){
+        ResultWrapper result = new ResultWrapper();
+        system.debug(searchTerm + limitRow + agentUrn + value);
+        try{
+            if(!String.isBlank(searchTerm) || !String.isBlank(value)) {
+                String strQuery = getStrQueryString(searchTerm, limitRow,agentUrn, value, excludedContacts);
+                List<Contact> dataRecords = Database.query(strQuery);
+
+                if(!dataRecords.isEmpty() && !String.isBlank(value)){
+                    result.value = dataRecords[0].Id;
+                    result.valueLabel = dataRecords[0].Name + ' - ' + dataRecords[0].Email;
+                }
+                //result.data = dataRecords;
+                for(Contact con : dataRecords){
+                    result.data.add(new DataWrapper(con.Id, con.Name + ' - ' + con.Email));
+                }
+           }
+            
+        }catch(Exception ex){
+            result.status = 'ERROR';
+            result.errorMsg = ex.getMessage();
+        }
+        return result;
+    }
+    private static String getStrQueryString(String searchTerm, Integer limitRow, String agentUrn, String value, List<String> excludedContacts){
+        searchTerm = String.escapeSingleQuotes(searchTerm);
+        String strSelect  = 'SELECT Id, Name, Email ';
+        strSelect += ' FROM Contact';
+        String condition = '';
+        if(!String.isBlank(value)){
+            condition = ' WHERE Id = \'' + value +'\'';
+        }else if(!String.isBlank(searchTerm)){
+            condition = ' WHERE ( Name like \'%'+ searchTerm + '%\'';
+            condition += ' OR Email like \'%'+ searchTerm + '%\'';
+            condition += ')';
+            condition += ' AND Agent_URN__c = \''+ agentUrn + '\' AND Has_left_organisation__c = false and Requires_Verification__c = false';
+        }
+        if(!excludedContacts.isEmpty()){
+            condition += ' AND Id NOT IN (\'' + String.join(excludedContacts,'\',\'') + '\')';
+        }
+        
+
+        String orderBy = ' ORDER BY Name ASC, CreatedDate DESC';
+        
+        String limitRowStr = ' LIMIT ' + String.valueOf(limitRow);
+        system.debug(strSelect + condition + orderBy + limitRowStr);
+        return strSelect + condition + orderBy + limitRowStr;
+        
+    }
+    
+    public class ResultWrapper{
+        @AuraEnabled
+        public String status{get;set;}
+        @AuraEnabled
+        public String errorMsg{get;set;}
+        @AuraEnabled
+        public String value{get;set;}
+        @AuraEnabled
+        public String valueLabel{get;set;}
+        @AuraEnabled
+        public List<DataWrapper> data{get;set;}
+        public ResultWrapper(){
+            data = new List<DataWrapper>();
+            status = 'OK';
+        }
+    }
+    public class DataWrapper{
+        @AuraEnabled
+        public String label{get;set;}
+        @AuraEnabled
+        public String value{get;set;}
+        public DataWrapper(String value, String label){
+            this.label = label;
+            this.value = value;
+        }
+    }
+}
