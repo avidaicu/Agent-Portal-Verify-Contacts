@@ -155,7 +155,7 @@
 
 .THIS .search-filter-container {
     position: relative;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 .THIS.manage-agents .search-contact {
@@ -222,7 +222,7 @@
     text-align: center;
     padding: 0;
     margin-top:30px;
-    margin-bottom:30px;
+    margin-bottom:0;
 }
 
 .THIS .ap-pagination > p{
@@ -395,7 +395,7 @@
 }
 
 .THIS.slds-modal .slds-modal__header {
-    background: #0099d8;
+    background: #007add;
     color: #fff;
     border: none;
 }
