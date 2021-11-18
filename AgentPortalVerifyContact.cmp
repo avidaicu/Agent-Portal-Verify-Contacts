@@ -276,7 +276,7 @@
                                 <lightning:spinner alternativeText="Loading" size="small" variant="brand"/>
                         
                         </aura:if>
-                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="overflow:unset !important; overflow-y:initial !important">
+                        <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
                             
                         <p>
                             {!v.messageConfirmation}

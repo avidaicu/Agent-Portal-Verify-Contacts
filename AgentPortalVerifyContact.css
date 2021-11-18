@@ -409,6 +409,8 @@
 
 .THIS.slds-modal .slds-modal__content {
     padding: 25px;
+    overflow:unset !important; 
+    overflow-y:initial !important;
 }
 
 .THIS.slds-modal .slds-modal__footer .ap-btn {
