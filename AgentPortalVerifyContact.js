@@ -1,5 +1,12 @@
 ({
     doInit : function(component, event, helper) {
+        var filterOptions = [
+            {'label': $A.get("$Label.c.All"), 'value': 'All'}, 
+            {'label': $A.get("$Label.c.Active"), 'value': 'Active'},
+            {'label':  $A.get("$Label.c.Unverified"), 'value': 'Unverified'}
+            ];
+        
+        component.set("v.fiterViewOptions", filterOptions);
         component.set("v.isFetching", true);
         var action = component.get('c.getListAgentUrns');
         action.setCallback(this, function(response) {
@@ -60,100 +67,6 @@
         // enqueue action to invoke apex code
         $A.enqueueAction(action);
     },
-
-    /*
-    clickContact : function(component, event, helper) {
-       // get value 
-       var contactId = event.getSource().get("v.value"); 
-       var ischecked = event.getSource().get("v.checked"); 
-       var selectedAgents = new Set(component.get("v.selectedContactIds"));
-
-       component.set("v.ischecked", ischecked);
-       
-       if(ischecked){
-           selectedAgents.add(contactId);
-       }else{
-          selectedAgents.delete(contactId);
-       }
-       
-        component.set("v.selectedContactIds", selectedAgents);
-        
-        var contacts = component.get("v.contactList");
-        contacts.forEach(contact => {
-            if(contact.Requires_verification__c && selectedAgents.has(contact.Id)){
-                contact.isChecked = true;
-            }else{
-                contact.isChecked = false;
-            }
-            
-        });
-        component.set("v.contactList", contacts);
-        if(selectedAgents.size >= 1){
-            component.set("v.isChecked", true);
-        } else {
-            component.set("v.isChecked", false);
-        }
-        
-       	var el = document.getElementsByClassName(contactId);
-        if(ischecked){
-            el[0].classList.add("selected");
-        }else{
-           el[0].classList.remove("selected");  
-        }
-    },
-    clickAll : function(component, event, helper) {
-        // get value 
-        var ischecked = event.getSource().get("v.checked"); 
-        component.set("v.isCheckedAll",ischecked);
-        var selectedAgents = new Set();
-        var checkedBoxes;
-        var contacts = component.get("v.contactList");
-        if(!ischecked){
-            component.set("v.isChecked", false);
-            component.set("v.selectedContactIds", null);
-            if(component.find("checkContact")){
-                checkedBoxes = component.find("checkContact");
-                checkedBoxes.forEach(row=>{
-                    if(row.get("v.checked")){
-                        row.set("v.checked",false);
-                    }
-                });
-            }
-            
-        }else{
-            contacts.forEach(contact => {
-                if(contact.Requires_verification__c){
-                    selectedAgents.add(contact.Id);
-                }
-
-                
-            });
-
-            if(component.find("checkContact")){
-                checkedBoxes = component.find("checkContact");
-                checkedBoxes.forEach(row=>{
-                    if(!row.get("v.checked") && selectedAgents.has(row.get("v.value"))){
-                        row.set("v.checked",true);
-                    }
-                });
-            }
-            component.set("v.selectedContactIds", selectedAgents);
-            if(selectedAgents.size > 0){
-                component.set("v.isChecked", true);
-            }
-                
-        }
-        contacts.forEach(contact => {
-            if(contact.Requires_verification__c && selectedAgents.has(contact.Id)){
-                contact.isChecked = true;
-            }else{
-                contact.isChecked = false;
-            }
-            
-        });
-               
-     },
-     */
      searchContact : function(component, event, helper) {
         component.set("v.isFetching", true);
         var action = component.get('c.getContactsByEmailName');
@@ -200,8 +113,8 @@
         component.set("v.selectedAgentsInfo", selectedAgentsInfo);
         if(selectedAgentsInfo.length >= 1){
             component.set("v.openModal",true);
-            component.set("v.modalTitle", "Deactivate agent");
-            component.set("v.messageConfirmation", "Are you sure you want to deactivate the following agents? They will no longer have access to the Agent Portal. You will not able to active this agent in future. In Order to activate you would need to raise support request with your Study Group sales representative.");
+            component.set("v.modalTitle", $A.get("$Label.c.Deactivate_agent"));
+            component.set("v.messageConfirmation", $A.get("$Label.c.Deactivate_agent_message_modal_1"));
             component.set("v.isDeactivateAction",true);
         }
          else{
@@ -231,8 +144,8 @@
         component.set("v.selectedAgentsInfo", selectedAgentsInfo);
         if(selectedAgentsInfo.length >= 1){
             component.set("v.openModal",true);
-            component.set("v.modalTitle", "Verify agent");
-            component.set("v.messageConfirmation", "You are about to verify the following contacts. They will be granted full access to the agent portal.");
+            component.set("v.modalTitle",$A.get("$Label.c.Verify_agent"));
+            component.set("v.messageConfirmation", $A.get("$Label.c.Verify_agent_message_modal"));
             component.set("v.isDeactivateAction",false);
 
         }else{
@@ -264,9 +177,9 @@
             var state = response.getState();
            component.set("v.openModal", false);
             if (state === "SUCCESS"){                
-                component.set("v.contactListSearched", response.getReturnValue());
+                component.set("v.contactListSearched", response.getReturnValue());	
                 helper.handleFilter(component);
-                helper.showToast("Success!", 'The agents have been verified sucessfully!' ,"success", "dismissible",15000);
+                helper.showToast("Success!", $A.get("$Label.c.Verify_Agent_Success_Message") ,"success", "dismissible",15000);
             }else{
                 helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
@@ -279,7 +192,7 @@
         let replacedAgent = component.get("v.replacedAgent");
         component.set("v.noProvidedReplacer",null);
         if(!replacedAgent){
-            component.set("v.noProvidedReplacer",'Please select an agent from the list.');
+            component.set("v.noProvidedReplacer",$A.get("$Label.c.Select_Agent_Validate_Message"));
             return;
         }
         component.set("v.isupdatingContact", true);
@@ -303,7 +216,7 @@
             if (state === "SUCCESS"){                
                 component.set("v.contactListSearched", response.getReturnValue());
                 helper.handleFilter(component);
-                helper.showToast("Success!", 'The agent has been deactivated sucessfully!' ,"success", "dismissible",15000);
+                helper.showToast("Success!",$A.get("$Label.c.Deactive_Agent_Success_Message") ,"success", "dismissible",15000);
             }else{
                 helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
                 
@@ -318,20 +231,7 @@
         component.set("v.openModal",false);
     },
     setView: function(component, event, helper) {
-        //component.set("v.selectedContactIds", null);
-       // component.set("v.isChecked", false);
-       // component.find("checkAll").set("v.checked",false);
-
-        /*var checkedBoxes;
-        if(component.find("checkContact")){
-            checkedBoxes = Array.from(component.find("checkContact"));
-            checkedBoxes.forEach(row=>{
-                if(row.get("v.checked")){
-                    row.set("v.checked",false);
-                }
-            });
-        }*/
-        
+   
         
         helper.handleFilter(component);
         

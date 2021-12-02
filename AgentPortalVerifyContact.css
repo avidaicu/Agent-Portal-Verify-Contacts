@@ -1,8 +1,3 @@
-/* .THIS h1, .THIS h2 {
-    margin: 0!important;
-} */
-
-
 .THIS .is-hidden {
     display: none;
 }
@@ -83,19 +78,6 @@
 .THIS .ap-verify-contacts table.ap-select-agency tr:nth-child(even) {
     background: #f9f9f9;
 }
-
-/* .THIS .ap-verify-contacts table.ap-select-agency .selected {
-    border: 2px solid #A4DAF4;
-    background: #DBF1FB;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency .selected td {
-    border-bottom: none;
-}
-
-.THIS .ap-verify-contacts table.ap-select-agency .selected:nth-child(even) {
-    background: #DBF1FB;
-} */
 
 .THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox_faux, 
 .THIS .slds-form-element .slds-checkbox [type=checkbox][disabled]+.slds-checkbox--faux, 
@@ -586,13 +568,6 @@
     .THIS .ap-verify-contacts table.ap-select-agency thead tr td{
         display: none;
     }
-    
-    /*
-    .THIS .ap-verify-contacts table.ap-select-agency thead tr td:first-child{
-        display: block;
-        border:none;
-    }
-    */
 
     .THIS .ap-verify-contacts table tbody,
     .THIS .ap-verify-contacts table tr,
@@ -697,32 +672,34 @@
 }
 
 .THIS .loader {
-  padding: 60px 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 100%;
-  width: 100%;
-  overflow: hidden;
-position: relative;
-    
-    width: 100%; height: 60px; z-index:9000
+    padding: 60px 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    width: 100%; 
+    height: 60px; 
+    z-index:9000;
 }
+
 .THIS .loader-status {
-  position: absolute;
-  z-index: 1;
-  background-color: transparent;
-  border: 1px solid #ccc;
-  border-radius: 50%;
-  opacity: 0.8;
-  width: 20px;
-  height: 20px;
-  left: 50%;
-  top: 50%;
-  margin-left: -10px;
-  margin-top: -10px;
-  animation: scale-fade 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
+    position: absolute;
+    z-index: 1;
+    background-color: transparent;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    opacity: 0.8;
+    width: 20px;
+    height: 20px;
+    left: 50%;
+    top: 50%;
+    margin-left: -10px;
+    margin-top: -10px;
+    animation: scale-fade 1.5s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
 }
 
 @keyframes scale-fade {

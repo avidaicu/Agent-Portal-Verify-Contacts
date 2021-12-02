@@ -2,7 +2,6 @@
     transactionsPerPage: 10,
     helperMethod : function(component, contacts) {
 		// Display first batch of contacts
-		//let totalPages = Math.ceil(contacts.length / this.transactionsPerPage);
         let totalPages = component.get("v.totalPages");
         component.set('v.totalPages', totalPages);
         this.pageContacts(component, 0);

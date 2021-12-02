@@ -104,13 +104,7 @@
         action.setCallback(this, function(response) {
             var state = response.getState();
             if (state === "SUCCESS"){
-               component.set("v.agentList", response.getReturnValue().agentList);
-                console.log('response.getReturnValue().agentList: ', response.getReturnValue().agentList);
-                if(!response.getReturnValue().agentList || response.getReturnValue().agentList.length == 0){
-                    component.set("v.isAuthorised", false);
-                }else{
-                    component.set("v.isAuthorised", true);
-                }
+                component.set("v.isAuthorised", response.getReturnValue());
             }else{
                 helper.showToast("Error!", response.getError()[0].message ,"error", "dismissible",15000);
             }
